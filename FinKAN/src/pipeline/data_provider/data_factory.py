@@ -1,13 +1,13 @@
-from data_provider.data_loader import PETR4
+from data_provider.data_loader import PETR4_dataset
 from torch.utils.data import DataLoader
 
 data_dict = {
-    'PETR4': PETR4
+    'PETR4':  PETR4_dataset,
 }
+
 
 def data_provider(args, flag):
     Data = data_dict[args.data]
-
     if flag == 'test':
         shuffle_flag = False
         drop_last = False
