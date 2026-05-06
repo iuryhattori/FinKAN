@@ -12,8 +12,6 @@ from scipy.signal import savgol_filter
 from torch import flatten, dropout
 from torch.nn.functional import gelu
 
-# from src.kan import KAN
-
 acv = nn.GELU()
 
 

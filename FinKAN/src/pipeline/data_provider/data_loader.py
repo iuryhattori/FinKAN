@@ -64,18 +64,15 @@ class PETR4_dataset(Dataset):
 
         df_stamp = df_raw[['DATE']][border1 : border2]
         df_stamp['DATE'] = pd.to_datetime(df_stamp.DATE)
-        df_stamp = df_raw[['DATE']][border1:border2]
-        df_stamp['DATE'] = pd.to_datetime(df_stamp.DATE)
 
-        if self.timeenc == 0:
-            print(f"[DEBUG] timeenc == 0")
-            df_stamp['month'] = df_stamp.DATE.apply(lambda row: row.month, 1)
-            df_stamp['day'] = df_stamp.DATE.apply(lambda row: row.day, 1)
-            df_stamp['weekday'] = df_stamp.DATE.apply(lambda row: row.weekday(), 1)
-            df_stamp['hour'] = df_stamp.DATE.apply(lambda row: row.hour, 1)
-            df_stamp['minute'] = df_stamp.DATE.apply(lambda row: row.minute, 1)
-            df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
-            data_stamp = df_stamp.drop(['DATE'], axis= 1).values
+        df_stamp['month'] = df_stamp.DATE.apply(lambda row: row.month, 1)
+        df_stamp['day'] = df_stamp.DATE.apply(lambda row: row.day, 1)
+        df_stamp['weekday'] = df_stamp.DATE.apply(lambda row: row.weekday(), 1)
+        df_stamp['hour'] = df_stamp.DATE.apply(lambda row: row.hour, 1)
+        df_stamp['minute'] = df_stamp.DATE.apply(lambda row: row.minute, 1)
+        df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
+        data_stamp = df_stamp.drop(['DATE'], axis= 1).values
+
         data_stamp = np.asarray(data_stamp, dtype=np.float32)
         self.data_x = data[border1 : border2]    
         self.data_y = data[border1 : border2]

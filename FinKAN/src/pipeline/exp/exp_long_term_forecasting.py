@@ -119,7 +119,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             for i, batch in enumerate(train_loader):
                 iter_count += 1
                 model_optim.zero_grad(set_to_none=True)
-                batch_x, batch_y, batch_x_mark, batch_y_mark, batch_x_aux = batch
+                batch_x, batch_y, batch_x_mark, batch_y_mark, = batch
                 
 
                 batch_x = batch_x.float().to(self.device)           
@@ -129,7 +129,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 if i == 0:
                     print("batch_x      :", batch_x.shape)
                     print("batch_x_mark :", batch_x_mark.shape if batch_x_mark is not None else None)
-                    print("batch_x_aux  :", batch_x_aux.shape if batch_x_aux is not None else None)
 
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
                 dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
@@ -216,10 +215,9 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         np.random.seed(fix_seed)
         torch.set_num_threads(6)
 
-        # Record start time and memory usage
         start_time = time.time()
         process = psutil.Process(os.getpid())
-        start_memory = process.memory_info().rss / (1024 * 1024)  # Convert to MB
+        start_memory = process.memory_info().rss / (1024 * 1024)
 
         test_data, test_loader = self._get_data(flag='test')
         if test:
