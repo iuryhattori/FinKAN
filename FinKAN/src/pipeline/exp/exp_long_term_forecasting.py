@@ -68,8 +68,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
-                outputs = outputs[:, -self.args.pred_len:, :]
-                batch_y = batch_y[:, -self.args.pred_len:, :].to(self.device)
+                outputs = outputs[:, -self.args.pred_len:, :self.args.n_targets]
+                batch_y = batch_y[:, -self.args.pred_len:, :self.args.n_targets].to(self.device)
 
                 loss = criterion(outputs, batch_y)
                 
@@ -119,7 +119,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             for i, batch in enumerate(train_loader):
                 iter_count += 1
                 model_optim.zero_grad(set_to_none=True)
-                batch_x, batch_y, batch_x_mark, batch_y_mark, = batch
+                batch_x, batch_y, batch_x_mark, batch_y_mark= batch
                 
 
                 batch_x = batch_x.float().to(self.device)           
@@ -141,8 +141,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         else:
                              outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
-                        outputs = outputs[:, -self.args.pred_len:, :]
-                        batch_y = batch_y[:, -self.args.pred_len:, :].to(self.device)
+                        outputs = outputs[:, -self.args.pred_len:, :self.args.n_targets]
+                        batch_y = batch_y[:, -self.args.pred_len:, :self.args.n_targets].to(self.device)
                         loss = criterion(outputs, batch_y)
 
                 else:
@@ -151,8 +151,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
-                    outputs = outputs[:, -self.args.pred_len:, :]
-                    batch_y = batch_y[:, -self.args.pred_len:, :].to(self.device)
+                    outputs = outputs[:, -self.args.pred_len:, :self.args.n_targets]
+                    batch_y = batch_y[:, -self.args.pred_len:, :self.args.n_targets].to(self.device)
                     loss = criterion(outputs, batch_y)              
 
                 if (i + 1) % 100 == 0:
@@ -215,9 +215,10 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         np.random.seed(fix_seed)
         torch.set_num_threads(6)
 
+        # Record start time and memory usage
         start_time = time.time()
         process = psutil.Process(os.getpid())
-        start_memory = process.memory_info().rss / (1024 * 1024)
+        start_memory = process.memory_info().rss / (1024 * 1024)  # Convert to MB
 
         test_data, test_loader = self._get_data(flag='test')
         if test:
@@ -266,8 +267,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
-                outputs = outputs[:, -self.args.pred_len:, :]
-                batch_y = batch_y[:, -self.args.pred_len:, :].to(self.device)
+                outputs = outputs[:, -self.args.pred_len:, :self.args.n_targets]
+                batch_y = batch_y[:, -self.args.pred_len:, :self.args.n_targets].to(self.device)
 
                 mse.update(mse_loss(outputs, batch_y).item(), batch_x.size(0))
                 mae.update(mae_loss(outputs, batch_y).item(), batch_x.size(0))

@@ -93,17 +93,30 @@ class PETR4_dataset(Dataset):
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
     def inverse_transform(self, data):
-        is_3d = False
         if not self.scale:
             return data
+            
+        is_3d = False
         if len(data.shape) == 3:
             B, T, C = data.shape
-            data= data.reshape(-1, C)
+            data = data.reshape(-1, C)
             is_3d = True
-        data_denorm = self.scaler.inverse_transform(data)
+        else:
+            C = data.shape[-1]
+
+        num_features_scaler = self.scaler.n_features_in_
+        
+        if C != num_features_scaler:
+            dummy = np.zeros((len(data), num_features_scaler))
+            dummy[:, :C] = data
+            dummy_denorm = self.scaler.inverse_transform(dummy)
+            data_denorm = dummy_denorm[:, :C]
+        else:
+            data_denorm = self.scaler.inverse_transform(data)
+
         if is_3d:
             return data_denorm.reshape(B, T, C)
-        
         return data_denorm
+            
     def get_channel_names(self):
         return self.cols_base
