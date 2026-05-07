@@ -5,7 +5,8 @@ import math
 
 
 class KANLinear(nn.Module):
-    def __init__(self, in_features, out_features, grid_size=5, spline_order=3, enable_standalone_scale_spline=True, base_activation=nn.SiLU, grid_range=[-1, 1]):
+    def __init__(self, in_features, out_features, grid_size=5, spline_order=3, enable_standalone_scale_spline=True, base_activation=nn.SiLU, grid_range=[-1, 1],
+                 init_alpha = 0.25, init_beta = 1.0, scale_spline = 1.0):
         super(KANLinear, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -19,9 +20,15 @@ class KANLinear(nn.Module):
         grid = (torch.arange(-spline_order, grid_size + spline_order + 1) * h + grid_range[0]).expand(in_features, -1).contiguous()
         self.register_buffer("grid", grid)
 
+        self.scale_spline = scale_spline
+
         self.base_weight = nn.Parameter(torch.Tensor(out_features, in_features))
         self.spline_weight = nn.Parameter(torch.Tensor(out_features, in_features, grid_size + spline_order))
         self.base_activation = base_activation()
+        total = grid_size + spline_order + 1
+        self._sigma = 1.0 / (in_features ** init_alpha * total ** init_beta)
+
+        self.reset_parameters()
 
 
     def b_splines(self, x):
@@ -51,4 +58,28 @@ class KANLinear(nn.Module):
     @property
     def scaled_spline_weight(self):
         return self.spline_weight * (self.spline_scaler.unsqueeze(-1) if self.enable_standalone_scale_spline else 1.0)
+    
+    def curve2coeff(self, x, y):
+        assert x.dim() == 2 and x.size(1) == self.in_features
+        assert y.size() == (x.size(0), self.in_features, self.out_features)
+        A = self.b_splines(x).transpose(0, 1)
+        B = y.transpose(0, 1)
+        solution = torch.linalg.lstsq(A, B).solution
+        result = solution.permute(2, 0, 1)
+        assert result.size() == (self.out_features, self.in_features, self.grid_size + self.spline_order)
+        return result.contiguous()
+
+    def reset_parameters(self):
+        nn.init.normal_(self.base_weight, mean=0.0, std=self._sigma)
+        with torch.no_grad():
+            noise = (
+                (torch.rand(self.grid_size + 1, self.in_features, self.out_features) - 1 / 2)
+                * self._sigma
+            )
+            self.spline_weight.data.copy_(
+                (self.scale_spline if not self.enable_standalone_scale_spline else 1.0)
+                * self.curve2coeff(self.grid.T[self.spline_order : -self.spline_order], noise)
+            )
+            if self.enable_standalone_scale_spline:
+                nn.init.kaiming_uniform_(self.spline_scaler, a=math.sqrt(5) * self.scale_spline)
     
