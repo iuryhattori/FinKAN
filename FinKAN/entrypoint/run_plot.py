@@ -39,7 +39,7 @@ if __name__ == '__main__':
     torch.set_num_threads(6)
 
     config           = "config.yaml"
-    checkpoint_setting = "output_1h"
+    checkpoint_setting = "Train_model_test_output_10-05-2026_22_45-48_4_3"
     checkpoint_path  = f'./artifacts/checkpoints/{checkpoint_setting}/checkpoint.pth'
 
     if not os.path.exists(checkpoint_path):
