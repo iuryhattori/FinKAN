@@ -2,7 +2,6 @@
 from threading import Lock, Thread
 from collections import deque
 import time
-from annotated_types import MaxLen
 from src.pipeline.meta_trader.Mt5 import Mt5
 from src.pipeline.abstract.methods import DataSource
 from src.pipeline.preprocessing.preprocess import FrameProcessor
@@ -20,7 +19,7 @@ class Collector:
         self._process = process
         self._active = False
         self._lock   = Lock()
-        self._last_df: deque[pl.DataFrame] = deque(maxlen=MaxLen)
+        self._last_df: deque[pl.DataFrame] = deque(maxlen=int(maxlen))
 
     @property
     def last_df(self) -> pl.DataFrame | None:
@@ -38,7 +37,7 @@ class Collector:
         except Exception as e:
             print()
 
-    def collect(self, timeframe : str, interval : float = 1.0) -> None:
+    def collect(self, timeframe : str, interval : float = 5.0) -> None:
         while self._active:
             frames = [
                 self._source.fetch(symb, timeframe)
@@ -47,4 +46,6 @@ class Collector:
             result = self._process.process_data(frames)
             with self._lock:
                 self._last_df.append(result)
+                print(self._last_df[-1])
+                
             time.sleep(interval)
