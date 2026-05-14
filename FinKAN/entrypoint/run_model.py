@@ -57,6 +57,12 @@ if __name__ == '__main__':
     save_time_model = datetime.now().strftime('%d-%m-%Y_%H_%M-%S')
     dataset_name = os.path.splitext(os.path.basename(args.data_path))[0]
 
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    setting_save = f'prediction_1h'
+    save_model = os.path.join(current_dir, '..', 'onnx', f'{setting_save}')
+    os.makedirs(save_model, exist_ok=True)
+    onnx_path = os.path.join(save_model, f"{setting_save}.onnx")
+
     setting = f'Train_model_test_{dataset_name}_{save_time_model}_{args.seq_len}_{args.patience}'
 
 
@@ -64,9 +70,10 @@ if __name__ == '__main__':
     print(f'>>>>>>> Iniciando Experimento: {setting} >>>>>>>')
     print(f'>>>>>>> Configuração utilizada: {args} >>>>>>>')
     Exp = Exp_Long_Term_Forecast(args)
-    
     model = Exp.train(setting=setting)
     Exp.test(setting=setting, test=1)
+    Exp.export_onnx(setting=setting, onnx_path=onnx_path)
+    print(f"Modelo ONNX salvo em: {onnx_path}")
 
 
 

@@ -2,6 +2,7 @@ import random
 from data_provider.data_factory import data_provider
 from exp.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping, adjust_learning_rate, AverageMeter
+from src.pipeline.utils.wrapper import ProductionWrapper
 from layers.KANLinear import KANLinear
 import torch
 import torch.nn as nn
@@ -300,3 +301,49 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         print('mse:{}, mae:{}'.format(mse, mae))
 
         return mse, mae, predictions, ground_truth
+    
+    def export_onnx(self, setting, onnx_path="model.onnx"):
+        fix_seed = 2021
+        random.seed(fix_seed)
+        torch.manual_seed(fix_seed)
+        np.random.seed(fix_seed)
+        torch.set_num_threads(6)
+
+        ckpt_path = os.path.join(self.args.checkpoints, setting, 'checkpoint.pth')
+        self.model.load_state_dict(torch.load(ckpt_path, map_location=self.device))
+        self.model.to(self.device)
+        self.model.eval()
+
+        test_data, test_loader = self._get_data(flag='test')
+        batch_data = next(iter(test_loader))
+
+        batch_x, batch_y, batch_x_mark, batch_y_mark = batch_data
+
+        batch_x = batch_x.float().to(self.device)
+        batch_x_mark = batch_x_mark.float().to(self.device)
+
+        wrapper = ProductionWrapper(self.model, self.args).to(self.device)
+        wrapper.eval()
+
+        real_inputs = (batch_x, batch_x_mark)
+        input_names = ["batch_x", "batch_x_mark"]
+        dynamic_axes = {
+            "batch_x": {0: "batch_size"},
+            "batch_x_mark": {0: "batch_size"},
+            "output": {0:"batch_size"},
+        }
+        torch.onnx.export(
+            wrapper,
+            real_inputs,
+            onnx_path,
+            export_params=True,
+            opset_version=17,
+            do_constant_folding=True,
+            input_names=input_names,
+            output_names=["output"],
+            dynamic_axes=dynamic_axes,
+            dynamo=False
+        )
+
+
+
