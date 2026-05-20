@@ -112,6 +112,9 @@ class PETR4_dataset(BasePETR4Dataset):
         self.data_x = data[border1 : border2]    
         self.data_y = data[border1 : border2]
         self.data_stamp = data_stamp
+    
+    def get_channel_names(self):
+        return self.cols_base
 
 
     def __getitem__(self, index):
@@ -132,7 +135,7 @@ class PETR4_Prediction(BasePETR4Dataset):
     def __init__(self, df, scale=True, freq='15min', scalers_path = 'scalers/', size=None):
         super().__init__(scale=scale, freq=freq, size=size, scalers_path=scalers_path)
         self.df = df
-        self.__read_data()
+        self.__read_data__()
     def __read_data__(self):
         df = self.df.copy()
         cols_base = df.columns[1:]
@@ -140,23 +143,25 @@ class PETR4_Prediction(BasePETR4Dataset):
         print(f'Colunas Base : {cols_base}')
         df_base = df[cols_base]
         if self.scale:
-            self.scaler = joblib.load(self.scalers_path)
+            scaler_fname = 'output_scaler.pkl'
+            scaler_path = os.path.join(self.scalers_path, scaler_fname)
+            self.scaler = joblib.load(scaler_path)
             data = self.scaler.transform(df_base.values)
         else:
             data = df_base.values
         data = data.astype(np.float32)
 
 
-        df_stamp = df[['date']].copy()
-        df_stamp['date'] = pd.to_datetime(df_stamp.date)
+        df_stamp = df[['DATE']].copy()
+        df_stamp['DATE'] = pd.to_datetime(df_stamp.DATE)
 
 
-        df_stamp['month'] = df_stamp['date'].dt.month
-        df_stamp['day'] = df_stamp['date'].dt.day
-        df_stamp['weekday'] = df_stamp['date'].dt.weekday
-        df_stamp['hour'] = df_stamp['date'].dt.hour
-        df_stamp['minute'] = df_stamp['date'].dt.minute // 15
-        data_stamp = df_stamp.drop(['date'], axis=1).values
+        df_stamp['month'] = df_stamp['DATE'].dt.month
+        df_stamp['day'] = df_stamp['DATE'].dt.day
+        df_stamp['weekday'] = df_stamp['DATE'].dt.weekday
+        df_stamp['hour'] = df_stamp['DATE'].dt.hour
+        df_stamp['minute'] = df_stamp['DATE'].dt.minute // 15
+        data_stamp = df_stamp.drop(['DATE'], axis=1).values
 
         data_stamp = np.asarray(data_stamp, dtype=np.float32)
         self.data_x = data

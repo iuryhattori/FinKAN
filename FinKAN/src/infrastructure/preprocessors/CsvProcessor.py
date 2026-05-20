@@ -1,33 +1,7 @@
 import os
-from abc import ABC, abstractmethod
 from pathlib import Path
-from functools import reduce
 import polars as pl
-
-
-class ProcessorTemplate(ABC):
-    @staticmethod
-    def clean_cols(lfs: list[pl.LazyFrame]) -> list[pl.LazyFrame]:
-        return [
-            lf.select(pl.all().name.replace(r"[<>]", ""))
-            for lf in lfs
-        ]
-    @abstractmethod
-    def add_prefix(self, lfs: list[pl.LazyFrame]) -> list[pl.LazyFrame]:
-        pass
-
-    @staticmethod
-    def concat_lfs(lfs: list[pl.LazyFrame], on: str = "DATE") -> pl.LazyFrame:
-        return reduce(
-            lambda acc, lf: acc.join(lf, on=on, how="full", coalesce=True),
-            lfs
-        )
-    
-    @staticmethod
-    def remove_useless_cols(lfs : list[pl.LazyFrame], names : list) -> list[pl.LazyFrame]:
-        return [lf.drop(names, strict=True) for lf in lfs]
-    
-
+from src.infrastructure.templates.ProcessorTemplate import ProcessorTemplate
 
 class CSVProcessor(ProcessorTemplate):
     def __init__(self, root_folder : str, separator : str = '\t') -> None:
@@ -75,6 +49,13 @@ class CSVProcessor(ProcessorTemplate):
         return lf_i.filter(
             (pl.col("row_nr") >= first) & (pl.col("row_nr") <= last)
         ).drop("row_nr")
+    
+    @staticmethod
+    def clean_cols(lfs: list[pl.LazyFrame]) -> list[pl.LazyFrame]:
+        return [
+            lf.select(pl.all().name.replace(r"[<>]", ""))
+            for lf in lfs
+        ]
 
     @staticmethod
     def apply_linear_interpolate(lf: pl.LazyFrame) -> pl.LazyFrame:
@@ -92,30 +73,3 @@ class CSVProcessor(ProcessorTemplate):
         lf  = self.apply_clean_borders(lf)
         lf  = self.apply_linear_interpolate(lf)
         self.save_data(lf, output_folder)
-
-
-class FrameProcessor(ProcessorTemplate):
-    def __init__(self, names : list[str]) -> None:
-        self._names = names
-
-    def load(self, frames: list[pl.DataFrame]) -> list[pl.LazyFrame]:
-        return [df.lazy() for df in frames]
-    
-    def add_prefix(self, lfs : list[pl.LazyFrame]) -> list[pl.LazyFrame]:
-        return [
-            lf.rename({
-                col : f"{name}_{col}"
-                for col in lf.collect_schema().names()
-                if col != "time"
-            })
-            for lf, name in zip(lfs, self._names)
-        ]
-    
-    def process_data(self, frames : list[pl.DataFrame]):
-        lfs = self.load(frames)
-        lfs = self.remove_useless_cols(lfs, ["spread", "real_volume"])
-        lfs = self.add_prefix(lfs)
-        lf = self.concat_lfs(lfs, "time")
-        return [lf1.collect() for lf1 in lfs]
-
-

@@ -62,6 +62,8 @@ if __name__ == '__main__':
     save_model = os.path.join(current_dir, '..', 'onnx', f'{setting_save}')
     os.makedirs(save_model, exist_ok=True)
     onnx_path = os.path.join(save_model, f"{setting_save}.onnx")
+    args.scalers_path = save_model
+    config_dict['scalers_path'] = save_model
 
     setting = f'Train_model_test_{dataset_name}_{save_time_model}_{args.seq_len}_{args.patience}'
 

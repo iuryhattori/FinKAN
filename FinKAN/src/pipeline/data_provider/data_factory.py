@@ -1,6 +1,6 @@
 from zmq import Flag
 
-from data_provider.data_loader import PETR4_dataset, PETR4_Prediction
+from src.pipeline.data_provider.data_loader import PETR4_dataset, PETR4_Prediction
 from torch.utils.data import DataLoader
 
 data_dict = {

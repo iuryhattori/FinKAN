@@ -2,7 +2,7 @@
 
 root_path: './data/02-preprocessed/'
 data_path: 'output.csv'
-data: 'PETR4'
+data: 'PETR4_Prediction'
 
 enc_in: 15
 dec_in: 15
@@ -48,3 +48,6 @@ use_multi_gpu: false
 use_amp: false
 output_attention: false
 seasonal_patterns: null
+'scalers_path': 'onnx/prediction_1h'
+mt5_mode: 'test'
+start_pos: 2000
