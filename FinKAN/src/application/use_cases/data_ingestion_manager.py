@@ -1,9 +1,6 @@
-from src.domain.interfaces.collector_interface import Collector_Interface
 from src.application.ports.data_collector_port import DataCollectorPort
 import asyncio
-import traceback
 import logging
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

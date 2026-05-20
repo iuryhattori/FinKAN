@@ -1,5 +1,4 @@
-import time
-from typing import Tuple, List, Dict, Any
+from typing import Tuple
 import inspect
 from src.domain.interfaces.collector_interface import Collector_Interface
 from src.application.ports.data_collector_port import DataCollectorPort

@@ -6,15 +6,8 @@ from layers.Transformer import Encoder, EncoderLayer
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
-from scipy.signal import savgol_filter
-from torch import flatten, dropout
-from torch.nn.functional import gelu
 
 # from src.kan import KAN
-
-acv = nn.GELU()
 
 
 class NewGELU(nn.Module):

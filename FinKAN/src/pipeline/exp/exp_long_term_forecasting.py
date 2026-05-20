@@ -3,7 +3,6 @@ from data_provider.data_factory import data_provider
 from exp.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping, adjust_learning_rate, AverageMeter
 from src.pipeline.utils.wrapper import ProductionWrapper
-from layers.KANLinear import KANLinear
 import torch
 import torch.nn as nn
 from torch import optim

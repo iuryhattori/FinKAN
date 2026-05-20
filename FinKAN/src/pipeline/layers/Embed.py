@@ -1,7 +1,5 @@
-import math
 import torch
 import torch.nn as nn
-from layers.KANLinear import KANLinear
 
 class DataEmbedding_inverted(nn.Module):
     def __init__(self, c_in, d_model, grid_size, dropout=0.1):

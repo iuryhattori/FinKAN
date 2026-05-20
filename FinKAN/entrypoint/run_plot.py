@@ -1,4 +1,3 @@
-from math import exp
 import os
 import argparse  
 import random
@@ -7,8 +6,6 @@ import yaml
 import torch
 import numpy as np
 from datetime import datetime
-import pandas as pd
-import matplotlib.pyplot as plt
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.abspath(os.path.join(current_dir, '..'))

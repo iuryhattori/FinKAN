@@ -1,11 +1,5 @@
 import MetaTrader5 as mt5
-import pandas as pd
-import polars as pl
-import pytz
-from datetime import datetime, timezone
-import time
 from src.domain.interfaces.DataSource_Interface import DataSource_Interface
-from datetime import datetime, timezone
 
 class HistoricalMt5(DataSource_Interface):
     def __init__(self, login: int, password: str, server: str, start_pos: int = 0):

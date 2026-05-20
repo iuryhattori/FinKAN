@@ -1,9 +1,5 @@
 from src.domain.interfaces.buffer_interface import BufferInterface
 from src.domain.value_objects.raw_data import RawData
-import numpy as np
-import pandas as pd
-
-
 
 class RealDataBuffer(BufferInterface):
     def __init__(self, batch_size):

@@ -1,5 +1,4 @@
 import traceback
-from typing import Any
 
 from dataclasses import asdict
 import logging
@@ -8,8 +7,6 @@ from src.application.ports.predictor_port import PredictorPort
 from src.domain.interfaces.predictor_input_converter import PredictorInputConverter
 from src.domain.entities.Candle import Candle
 from src.domain.value_objects.raw_data import RawData
-import numpy as np
-import asyncio
 logger = logging.getLogger(__name__)
 class PredictorManager:
     def __init__(self, predictor : PredictorPort,
