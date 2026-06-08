@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from ast import Dict
 from typing import Any
-from src.domain.entities.Candle import Candle
+from src.domain.value_objects.Candle import Candle
 
 class DataSource_Interface(ABC):
     @abstractmethod

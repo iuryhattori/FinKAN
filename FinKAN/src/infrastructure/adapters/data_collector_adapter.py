@@ -5,7 +5,7 @@ from src.application.ports.data_collector_port import DataCollectorPort
 import asyncio
 from src.application.helpers.helper import raw_to_wide_record
 from src.domain.value_objects.raw_data import RawData
-from src.domain.entities.Candle import Candle
+from src.domain.value_objects.Candle import Candle
 
 class DataCollectorAdapter(DataCollectorPort):
     def __init__(self, collector: Collector_Interface, target_symbol: str = "PETR4"):

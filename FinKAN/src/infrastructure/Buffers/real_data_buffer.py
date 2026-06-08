@@ -15,6 +15,10 @@ class RealDataBuffer(BufferInterface):
     @property
     def is_full(self) -> bool:
         return self.size == self.batch_size
+    
         
     def reset(self) -> None:
         self.data.clear()
+
+    def get_data(self) -> list[RawData]:
+        return self.data.copy()

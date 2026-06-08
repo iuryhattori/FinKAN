@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from src.domain.value_objects.raw_data import RawData
-from src.domain.entities.Candle import Candle
+from src.domain.value_objects.Candle import Candle
 from typing import Tuple
 
 class DataCollectorPort(ABC):

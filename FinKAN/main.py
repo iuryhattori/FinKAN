@@ -1,12 +1,14 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-
+from src.presentation.Controllers.predictions import router 
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-
+from src.presentation.Controllers.candle import candle_router
 from src.infrastructure.factory.app_factory import AppFactory
 from src.infrastructure.config.app_config import AppConfig
+from src.presentation.Controllers.events import sse_router
 
 # Configurar logging
 logging.basicConfig(
@@ -19,18 +21,17 @@ load_dotenv()
 
 config = AppConfig(logger)
 factory = AppFactory(config, logger)
-app_context = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Gerencia startup e shutdown da aplicação."""
-    global app_context
     
     try:
         logger.info("=== Iniciando aplicação ===")
         
         app_context = factory.create_app_context()
+        app.state.app_context = app_context
         collector_manager = app_context["collector_manager"]
         collector = app_context["collector"]
         
@@ -74,11 +75,21 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://localhost:5173/"],  # Portas do Vite/dev
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(router)
+app.include_router(candle_router)
+app.include_router(sse_router)
 
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
+    app_context = getattr(app.state, "app_context", None)
     return {
         "status": "healthy",
         "app_context_initialized": app_context is not None
@@ -87,8 +98,8 @@ async def health_check():
 
 @app.get("/stop")
 async def stop_app():
-    """Endpoint para parar a aplicação."""
+    app_context = getattr(app.state, "app_context", None)
     if app_context:
-        app_context["collector_manager"].stop()
+        await app_context["collector_manager"].stop()
         return {"status": "stopped"}
     return {"status": "not_running"}

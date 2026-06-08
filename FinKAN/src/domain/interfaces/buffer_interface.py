@@ -16,3 +16,6 @@ class BufferInterface(ABC):
     @abstractmethod
     def reset(self) -> None:
         pass
+    @abstractmethod
+    def get_data(self) -> list[RawData]:
+        pass

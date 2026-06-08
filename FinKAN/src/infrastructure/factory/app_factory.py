@@ -8,6 +8,9 @@ from src.application.use_cases.prediction_manager import PredictorManager
 from src.infrastructure.adapters.data_collector_adapter import DataCollectorAdapter
 from src.application.use_cases.data_ingestion_manager import Collector_Manager
 from src.infrastructure.conversors.pandas_conversor import PandasPredictorInputConverter
+from src.infrastructure.storage.batch_candle_registry import BatchCandleRegistry
+from src.infrastructure.storage.batch_matrix_registry import BatchMatrixRegistry
+from src.infrastructure.storage.batch_candle_pred_registry import BatchCandlePredRegistry
 import onnxruntime as ort
 from typing import Any
 import logging
@@ -75,13 +78,23 @@ class AppFactory:
         args = argparse.Namespace(**config_dict)
         
         data_buffer = RealDataBuffer(self.config.get_buffer_size())
+        candle_buffer = RealDataBuffer(self.config.get_buffer_size())
         predictor = Predictor(session, args)
         conversor = PandasPredictorInputConverter()
         
+        batch_candle_registry = BatchCandleRegistry()
+        batch_matrix_registry = BatchMatrixRegistry()
+        batch_pred_registry = BatchCandlePredRegistry()
+        batch_candle_pred_registry = BatchCandlePredRegistry()
         prediction_manager = PredictorManager(
-            predictor, 
-            data_buffer,
-            conversor,
+            predictor=predictor, 
+            data_buffer=data_buffer,
+            candle_buffer=candle_buffer,
+            data_registry=batch_matrix_registry,
+            pred_registry=batch_pred_registry,
+            candle_registry=batch_candle_registry,
+            pred_candle_registry=batch_candle_pred_registry,
+            converter=conversor,
         )
         
         adapter = DataCollectorAdapter(collector)
@@ -96,4 +109,6 @@ class AppFactory:
             "task": None,
             "predictor": predictor,
             "session": session,
+            "batch_candle_pred_registry": batch_candle_pred_registry,
+            "batch_candle_registry": batch_candle_registry,
         }
