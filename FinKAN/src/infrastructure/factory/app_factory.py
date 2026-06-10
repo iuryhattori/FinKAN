@@ -1,13 +1,13 @@
 from src.infrastructure.config.app_config import AppConfig
 from src.infrastructure.config.predictor_settings import PredictorSettings
-from src.infrastructure.Mt5.historical_mt5 import HistoricalMt5
-from src.infrastructure.Mt5.real_time_mt5 import RealTime
+from src.infrastructure.mt5.historical_mt5 import HistoricalMt5
+from src.infrastructure.mt5.real_time_mt5 import RealTime
 from src.infrastructure.collectors.collector import Collector
-from src.infrastructure.Buffers.real_data_buffer import RealDataBuffer
-from src.infrastructure.Predictor.Predictor import Predictor
+from src.infrastructure.buffers.real_data_buffer import RealDataBuffer
+from src.infrastructure.predictor.predictor import Predictor
 from src.application.use_cases.prediction_manager import PredictorManager
 from src.infrastructure.adapters.data_collector_adapter import DataCollectorAdapter
-from src.application.use_cases.data_ingestion_manager import Collector_Manager
+from src.application.use_cases.data_ingestion_manager import CollectorManager
 from src.infrastructure.conversors.pandas_conversor import PandasPredictorInputConverter
 from src.infrastructure.storage.batch_candle_registry import BatchCandleRegistry
 from src.infrastructure.storage.batch_matrix_registry import BatchMatrixRegistry
@@ -108,7 +108,7 @@ class AppFactory:
         )
 
         adapter = DataCollectorAdapter(collector)
-        collector_manager = Collector_Manager(adapter, prediction_manager)
+        collector_manager = CollectorManager(adapter, prediction_manager)
 
         self.logger.info("Contexto criado com sucesso")
 

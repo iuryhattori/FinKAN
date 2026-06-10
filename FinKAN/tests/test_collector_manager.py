@@ -1,4 +1,4 @@
-from src.application.use_cases.data_ingestion_manager import Collector_Manager
+from src.application.use_cases.data_ingestion_manager import CollectorManager
 
 
 class FakeAdapter:
@@ -36,7 +36,7 @@ async def test_run_collects_and_forwards_to_prediction_manager():
     adapter = FakeAdapter()
     holder = {}
     prediction_manager = FakePredictionManager(holder)
-    manager = Collector_Manager(adapter, prediction_manager)
+    manager = CollectorManager(adapter, prediction_manager)
     holder["manager"] = manager
 
     await manager.run("M15", interval=0)
@@ -48,7 +48,7 @@ async def test_run_collects_and_forwards_to_prediction_manager():
 
 async def test_run_stops_after_max_retries_on_connection_error():
     adapter = FakeAdapter(error=ConnectionError("MT5 down"))
-    manager = Collector_Manager(
+    manager = CollectorManager(
         adapter,
         prediction_manager=None,
         max_retries=2,
@@ -64,7 +64,7 @@ async def test_run_stops_after_max_retries_on_connection_error():
 
 async def test_start_ignores_duplicate_start():
     adapter = FakeAdapter(error=ConnectionError("MT5 down"))
-    manager = Collector_Manager(adapter, prediction_manager=None, max_retries=1)
+    manager = CollectorManager(adapter, prediction_manager=None, max_retries=1)
 
     await manager.start("M15", interval=0)
     first_task = manager._task

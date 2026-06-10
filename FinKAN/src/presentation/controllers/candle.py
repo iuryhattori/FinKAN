@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 import asyncio
-from src.presentation.Schemas.candle_schema import CandleResponse
+from src.presentation.schemas.candle_schema import CandleResponse
 
 candle_router = APIRouter()
 

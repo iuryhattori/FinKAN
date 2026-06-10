@@ -4,12 +4,12 @@ import logging
 import pandas as pd
 
 from src.domain.interfaces.buffer_interface import BufferInterface
-from src.domain.interfaces.batch_interface import batch_interface
+from src.domain.interfaces.batch_registry_interface import BatchRegistryInterface
 from src.application.ports.predictor_port import PredictorPort
 from src.domain.value_objects.candle_batch import CandleBatch
 from src.domain.interfaces.predictor_input_converter import PredictorInputConverter
 from src.domain.value_objects.candle_prediction import CandlePrediction
-from src.domain.value_objects.Candle import Candle
+from src.domain.value_objects.candle import Candle
 from src.domain.value_objects.raw_data import RawData
 
 logger = logging.getLogger(__name__)
@@ -19,10 +19,10 @@ class PredictorManager:
     def __init__(self, predictor : PredictorPort,
                  data_buffer : BufferInterface,
                  candle_buffer : BufferInterface,
-                 data_registry: batch_interface,
-                 pred_registry: batch_interface,
-                 pred_candle_registry: batch_interface,
-                 candle_registry: batch_interface,
+                 data_registry: BatchRegistryInterface,
+                 pred_registry: BatchRegistryInterface,
+                 pred_candle_registry: BatchRegistryInterface,
+                 candle_registry: BatchRegistryInterface,
                  converter : PredictorInputConverter
                  ):
         self.data_buffer = data_buffer

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 
-from src.presentation.Schemas.prediction_schema import PredictionResponse
+from src.presentation.schemas.prediction_schema import PredictionResponse
 
 router = APIRouter()
 

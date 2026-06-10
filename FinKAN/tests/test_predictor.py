@@ -5,7 +5,7 @@ import pytest
 from sklearn.preprocessing import RobustScaler
 
 from src.infrastructure.config.predictor_settings import PredictorSettings
-from src.infrastructure.Predictor.Predictor import Predictor
+from src.infrastructure.predictor.predictor import Predictor
 
 N_FEATURES = 15
 SEQ_LEN = 4

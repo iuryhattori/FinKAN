@@ -1,14 +1,14 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-from src.presentation.Controllers.predictions import router 
+from src.presentation.controllers.predictions import router 
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from src.presentation.Controllers.candle import candle_router
+from src.presentation.controllers.candle import candle_router
 from src.infrastructure.factory.app_factory import AppFactory
 from src.infrastructure.config.app_config import AppConfig
-from src.presentation.Controllers.events import sse_router
+from src.presentation.controllers.events import sse_router
 
 # Configurar logging
 logging.basicConfig(

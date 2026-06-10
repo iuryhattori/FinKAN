@@ -1,14 +1,14 @@
 import logging
 
-from src.domain.interfaces.DataSource_Interface import DataSource_Interface
-from src.domain.interfaces.collector_interface import Collector_Interface
+from src.domain.interfaces.data_source_interface import DataSourceInterface
+from src.domain.interfaces.collector_interface import CollectorInterface
 
 logger = logging.getLogger(__name__)
 
-class Collector(Collector_Interface):
+class Collector(CollectorInterface):
     def __init__(self,
                  symbols : list[str],
-                 source : DataSource_Interface,):
+                 source : DataSourceInterface,):
         self._symbols = symbols
         self._source = source
 

@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class Collector_Manager:
+class CollectorManager:
     def __init__(
         self, 
         collector_adapter: DataCollectorPort,

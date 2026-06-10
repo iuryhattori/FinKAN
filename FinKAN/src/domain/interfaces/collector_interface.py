@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-import asyncio
 
 
-
-class Collector_Interface(ABC):
+class CollectorInterface(ABC):
     @abstractmethod
     def connect(self) -> None:
         pass

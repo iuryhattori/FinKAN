@@ -1,8 +1,8 @@
 from collections import deque
 
-from src.domain.interfaces.batch_interface import batch_interface
+from src.domain.interfaces.batch_registry_interface import BatchRegistryInterface
 
-class BatchPredRegistry(batch_interface):
+class BatchPredRegistry(BatchRegistryInterface):
     def __init__(self, maxlen: int = 256):
         self._maxlen = maxlen
         self._batches = deque(maxlen=maxlen)

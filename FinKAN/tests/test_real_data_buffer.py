@@ -1,4 +1,4 @@
-from src.infrastructure.Buffers.real_data_buffer import RealDataBuffer
+from src.infrastructure.buffers.real_data_buffer import RealDataBuffer
 
 
 def test_buffer_starts_empty():

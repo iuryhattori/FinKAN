@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
-from ast import Dict
 from typing import Any
-from src.domain.value_objects.Candle import Candle
 
-class DataSource_Interface(ABC):
+class DataSourceInterface(ABC):
     @abstractmethod
     def connect(self) -> None:
         pass
     @abstractmethod
-    def fetch(self, symbols: str, timeframe : str) -> Dict:
+    def fetch(self, symbols: str, timeframe : str) -> Any:
         pass
     @abstractmethod
     def disconnect(self) -> None:

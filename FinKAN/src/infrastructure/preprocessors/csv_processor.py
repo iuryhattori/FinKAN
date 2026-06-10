@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 import polars as pl
-from src.infrastructure.templates.ProcessorTemplate import ProcessorTemplate
+from src.infrastructure.templates.processor_template import ProcessorTemplate
 
 class CSVProcessor(ProcessorTemplate):
     def __init__(self, root_folder : str, separator : str = '\t') -> None:

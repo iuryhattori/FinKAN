@@ -1,16 +1,16 @@
 from typing import Tuple
 import inspect
-from src.domain.interfaces.collector_interface import Collector_Interface
+from src.domain.interfaces.collector_interface import CollectorInterface
 from src.application.ports.data_collector_port import DataCollectorPort
 import asyncio
 from src.application.helpers.helper import records_to_raw_data, DEFAULT_SYMBOL_PREFIXES
 from src.domain.value_objects.raw_data import RawData
-from src.domain.value_objects.Candle import Candle
+from src.domain.value_objects.candle import Candle
 
 class DataCollectorAdapter(DataCollectorPort):
     def __init__(
         self,
-        collector: Collector_Interface,
+        collector: CollectorInterface,
         target_symbol: str = "PETR4",
         symbol_prefixes: dict[str, str] = None,
     ):

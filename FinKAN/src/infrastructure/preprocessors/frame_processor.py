@@ -1,6 +1,6 @@
 import polars as pl
 import numpy as np
-from src.infrastructure.templates.ProcessorTemplate import ProcessorTemplate
+from src.infrastructure.templates.processor_template import ProcessorTemplate
 
 
 class FrameProcessor(ProcessorTemplate):

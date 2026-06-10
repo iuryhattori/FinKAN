@@ -1,11 +1,11 @@
 import logging
 
 import MetaTrader5 as mt5
-from src.domain.interfaces.DataSource_Interface import DataSource_Interface
+from src.domain.interfaces.data_source_interface import DataSourceInterface
 
 logger = logging.getLogger(__name__)
 
-class HistoricalMt5(DataSource_Interface):
+class HistoricalMt5(DataSourceInterface):
     def __init__(self, login: int, password: str, server: str, start_pos: int = 0):
         self.login = login
         self.password = password

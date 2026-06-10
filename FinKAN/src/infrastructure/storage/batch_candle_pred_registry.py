@@ -1,9 +1,9 @@
 from collections import deque
 
-from src.domain.interfaces.batch_interface import batch_interface
+from src.domain.interfaces.batch_registry_interface import BatchRegistryInterface
 from src.domain.value_objects.candle_prediction import CandlePrediction
 
-class BatchCandlePredRegistry(batch_interface):
+class BatchCandlePredRegistry(BatchRegistryInterface):
     def __init__(self, maxlen: int = 256):
         self._maxlen = maxlen
         self._batches: deque[CandlePrediction] = deque(maxlen=maxlen)
