@@ -1,18 +1,21 @@
+# Serving (API + inferência)
+fastapi==0.135.2
+uvicorn==0.42.0
+python-dotenv==1.2.2
+PyYAML==6.0.3
+MetaTrader5==5.0.5735
+onnxruntime==1.24.3
+numpy==2.4.2
+pandas==2.3.3
+scikit-learn==1.8.0
+joblib==1.5.3
+pytz==2026.1.post1
 
-fastapi
-uvicorn
-python-dotenv
-pyyaml
-MetaTrader5
-onnxruntime
-torch
-numpy
-pandas
-polars
-scipy
-scikit-learn
-joblib
-pytz
-psutil
-pyzmq
-matplotlib
+# Treino / experimentação
+torch==2.10.0
+scipy==1.17.1
+psutil==7.2.2
+matplotlib==3.10.8
+
+# Pré-processamento
+polars==1.39.0

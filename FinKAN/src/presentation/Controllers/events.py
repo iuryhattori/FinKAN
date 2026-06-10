@@ -1,7 +1,10 @@
 import asyncio
 import json
+import logging
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
+
+logger = logging.getLogger(__name__)
 
 sse_router = APIRouter()
 
@@ -15,7 +18,7 @@ async def stream_market(request: Request):
         while True:
             try:
                 if await request.is_disconnected():
-                    print("Cliente desconectado do stream")
+                    logger.info("Cliente desconectado do stream")
                     break
 
                 candle_reg = app_context["batch_candle_registry"]
@@ -63,7 +66,7 @@ async def stream_market(request: Request):
                 await asyncio.sleep(1)
 
             except Exception as e:
-                print("Erro no event_generator:", repr(e))
+                logger.exception(f"Erro no event_generator: {e!r}")
                 await asyncio.sleep(1)
 
     return StreamingResponse(

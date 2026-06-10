@@ -1,5 +1,6 @@
 import os
 
+import logging
 import warnings
 
 import numpy as np
@@ -9,6 +10,24 @@ from torch.utils.data import Dataset
 import joblib
 
 warnings.filterwarnings('ignore')
+
+logger = logging.getLogger(__name__)
+
+
+def build_time_features(dates: pd.Series) -> np.ndarray:
+    """Extrai as features temporais (month, day, weekday, hour, minute//15) de forma vetorizada."""
+    dates = pd.to_datetime(dates)
+    stamp = np.stack(
+        [
+            dates.dt.month.values,
+            dates.dt.day.values,
+            dates.dt.weekday.values,
+            dates.dt.hour.values,
+            (dates.dt.minute // 15).values,
+        ],
+        axis=1,
+    )
+    return stamp.astype(np.float32)
 
 
 class BasePETR4Dataset(Dataset):
@@ -21,7 +40,7 @@ class BasePETR4Dataset(Dataset):
             self.seq_len = size[0]
             self.label_len = size[1]
             self.pred_len = size[2]
-        
+
         self.scale = scale
         self.freq = freq
         self.scalers_path = scalers_path
@@ -29,7 +48,7 @@ class BasePETR4Dataset(Dataset):
     def inverse_transform(self, data):
         if not self.scale:
             return data
-        
+
         is_3d = False
         if len(data.shape) == 3:
             B, T, C = data.shape
@@ -47,7 +66,7 @@ class BasePETR4Dataset(Dataset):
             data_denorm = self.scaler.inverse_transform(data)
 
         return data_denorm.reshape(B, T, C) if is_3d else data_denorm
-    
+
 class PETR4_dataset(BasePETR4Dataset):
     def __init__(self, root_path, data_path, flag='train', scale=True, freq='15min', size=None, scalers_path='scalers/'):
         super().__init__(scale=scale, freq=freq, size=size, scalers_path=scalers_path)
@@ -75,7 +94,7 @@ class PETR4_dataset(BasePETR4Dataset):
 
         cols_base = df_raw.columns[1:]
         self.cols_base = list(cols_base)
-        print(f'Colunas Base : {cols_base}')
+        logger.info(f'Colunas Base : {cols_base}')
         df_base = df_raw[cols_base]
 
         if self.scale:
@@ -86,8 +105,8 @@ class PETR4_dataset(BasePETR4Dataset):
                 scaler_name = os.path.splitext(self.data_path)[0].replace(os.sep, '_')
                 scaler_path = os.path.join(self.scalers_path, f'{scaler_name}_scaler.pkl')
                 joblib.dump(self.scaler, scaler_path)
-                print(f'[Scaler] Treinado e salvo em: {scaler_path}')
-                print(pd.DataFrame({
+                logger.info(f'[Scaler] Treinado e salvo em: {scaler_path}')
+                logger.info('\n' + pd.DataFrame({
                 'Feature' : self.cols_base,
                 'Mediana' : self.scaler.center_,
                 'IQR'     : self.scaler.scale_
@@ -96,22 +115,11 @@ class PETR4_dataset(BasePETR4Dataset):
             data = df_base.values
         data = data.astype(np.float32)
 
-        df_stamp = df_raw[['DATE']][border1 : border2]
-        df_stamp['DATE'] = pd.to_datetime(df_stamp.DATE)
-
-        df_stamp['month'] = df_stamp.DATE.apply(lambda row: row.month, 1)
-        df_stamp['day'] = df_stamp.DATE.apply(lambda row: row.day, 1)
-        df_stamp['weekday'] = df_stamp.DATE.apply(lambda row: row.weekday(), 1)
-        df_stamp['hour'] = df_stamp.DATE.apply(lambda row: row.hour, 1)
-        df_stamp['minute'] = df_stamp.DATE.apply(lambda row: row.minute, 1)
-        df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
-        data_stamp = df_stamp.drop(['DATE'], axis= 1).values
-
-        data_stamp = np.asarray(data_stamp, dtype=np.float32)
-        self.data_x = data[border1 : border2]    
+        data_stamp = build_time_features(df_raw['DATE'][border1 : border2])
+        self.data_x = data[border1 : border2]
         self.data_y = data[border1 : border2]
         self.data_stamp = data_stamp
-    
+
     def get_channel_names(self):
         return self.cols_base
 
@@ -129,7 +137,7 @@ class PETR4_dataset(BasePETR4Dataset):
         return seq_x, seq_y, seq_x_mark, seq_y_mark
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
-    
+
 class PETR4_Prediction(BasePETR4Dataset):
     def __init__(self, df, scale=True, freq='15min', scalers_path = 'scalers/', size=None):
         super().__init__(scale=scale, freq=freq, size=size, scalers_path=scalers_path)
@@ -139,7 +147,7 @@ class PETR4_Prediction(BasePETR4Dataset):
         df = self.df.copy()
         cols_base = df.columns[1:]
         self.cols_base = list(cols_base)
-        print(f'Colunas Base : {cols_base}')
+        logger.info(f'Colunas Base : {cols_base}')
         df_base = df[cols_base]
         if self.scale:
             scaler_fname = 'output_scaler.pkl'
@@ -150,21 +158,8 @@ class PETR4_Prediction(BasePETR4Dataset):
             data = df_base.values
         data = data.astype(np.float32)
 
-
-        df_stamp = df[['DATE']].copy()
-        df_stamp['DATE'] = pd.to_datetime(df_stamp.DATE)
-
-
-        df_stamp['month'] = df_stamp['DATE'].dt.month
-        df_stamp['day'] = df_stamp['DATE'].dt.day
-        df_stamp['weekday'] = df_stamp['DATE'].dt.weekday
-        df_stamp['hour'] = df_stamp['DATE'].dt.hour
-        df_stamp['minute'] = df_stamp['DATE'].dt.minute // 15
-        data_stamp = df_stamp.drop(['DATE'], axis=1).values
-
-        data_stamp = np.asarray(data_stamp, dtype=np.float32)
         self.data_x = data
-        self.data_stamp = data_stamp
+        self.data_stamp = build_time_features(df['DATE'])
 
     def __getitem__(self,index):
         s_begin = index

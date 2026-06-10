@@ -36,7 +36,7 @@ use_norm: true
 scale: true
 scale_aux: true
 embed: 'TimeF'
-timeenc: 1'
+timeenc: 1
 
 checkpoints: './artifacts/checkpoints/'
 num_workers: 0

@@ -1,7 +1,8 @@
-import traceback
-
 from dataclasses import asdict
 import logging
+
+import pandas as pd
+
 from src.domain.interfaces.buffer_interface import BufferInterface
 from src.domain.interfaces.batch_interface import batch_interface
 from src.application.ports.predictor_port import PredictorPort
@@ -10,7 +11,10 @@ from src.domain.interfaces.predictor_input_converter import PredictorInputConver
 from src.domain.value_objects.candle_prediction import CandlePrediction
 from src.domain.value_objects.Candle import Candle
 from src.domain.value_objects.raw_data import RawData
+
 logger = logging.getLogger(__name__)
+
+
 class PredictorManager:
     def __init__(self, predictor : PredictorPort,
                  data_buffer : BufferInterface,
@@ -35,29 +39,35 @@ class PredictorManager:
         try:
             self.data_buffer.add(data)
             self.candle_buffer.add(candle)
-            logger.info(f"Entrada do buffer: {data!r}")
-            if self.data_buffer.is_full:
-                logger.debug(f"Conteúdo do buffer: {self.data_buffer.data!r}")
-                buffer_data = self.data_buffer.get_data()
-                candles = self.candle_buffer.get_data()
-                batch_candle = CandleBatch(candles = candles, batch_id = self.batch_count)
-                self.batch_count += 1
-                self.candle_registry.add(batch_candle)
-                dict_buffer = [asdict(r) for r in buffer_data]
-                input = self.converter.convert(dict_buffer)
-                # matrix = self.converter.convert_to_matrix(input)
-                self.data_registry.add(input)
-                logger.debug(f"input_df.dtypes:\n{getattr(input, 'dtypes', 'N/A')}")
-                logger.debug(f"input_df.head():\n{getattr(input, 'head', lambda: 'N/A')() if hasattr(input, 'head') else 'N/A'}")
-                logger.debug(f"input:\n{input}")
-                print(input)
-                self.data_buffer.reset()
-                self.candle_buffer.reset()
-                prediction = await self.predictor.predict(input)
-                self.pred_registry.add(prediction)
-                candle_pred = CandlePrediction(symbol=candle.symbol, raw_data=prediction)
-                self.pred_candle_registry.add(candle_pred)
-                print(f"Prediction: {prediction}")
+            logger.debug(f"Entrada do buffer: {data!r}")
+
+            if not self.data_buffer.is_full:
+                return
+
+            input_df = self._flush_buffers()
+            prediction = await self.predictor.predict(input_df)
+            self._register_prediction(candle.symbol, prediction)
         except Exception as e:
-            print(f"[ERROR] {type(e).__name__}: {e}")   
-            traceback.print_exc()
+            logger.exception(f"Erro ao processar candle: {type(e).__name__}: {e}")
+
+    def _flush_buffers(self) -> pd.DataFrame:
+        """Consolida os buffers em batch, registra e devolve o input do modelo."""
+        buffer_data = self.data_buffer.get_data()
+        candles = self.candle_buffer.get_data()
+
+        batch_candle = CandleBatch(candles=candles, batch_id=self.batch_count)
+        self.batch_count += 1
+        self.candle_registry.add(batch_candle)
+
+        input_df = self.converter.convert([asdict(r) for r in buffer_data])
+        self.data_registry.add(input_df)
+
+        self.data_buffer.reset()
+        self.candle_buffer.reset()
+        return input_df
+
+    def _register_prediction(self, symbol: str, prediction) -> None:
+        self.pred_registry.add(prediction)
+        candle_pred = CandlePrediction(symbol=symbol, raw_data=prediction)
+        self.pred_candle_registry.add(candle_pred)
+        logger.info(f"Predição registrada para {symbol}: {prediction}")

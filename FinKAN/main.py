@@ -26,7 +26,7 @@ factory = AppFactory(config, logger)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Gerencia startup e shutdown da aplicação."""
-    
+    app_context = None
     try:
         logger.info("=== Iniciando aplicação ===")
         
@@ -77,7 +77,7 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://localhost:5173/"],  # Portas do Vite/dev
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Portas do Vite/dev
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -96,7 +96,7 @@ async def health_check():
     }
 
 
-@app.get("/stop")
+@app.post("/stop")
 async def stop_app():
     app_context = getattr(app.state, "app_context", None)
     if app_context:

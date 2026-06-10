@@ -1,30 +1,37 @@
-
 from src.domain.value_objects.raw_data import RawData
-import numpy as np
 
-def raw_to_wide_record(
-    petr4: np.ndarray,
-    wdo: np.ndarray,
-    win: np.ndarray,
+# Mapeia o símbolo do broker para o prefixo das features esperado pelo modelo.
+# A ordem das chaves define a ordem das colunas do dataset de treino.
+DEFAULT_SYMBOL_PREFIXES: dict[str, str] = {
+    "PETR4": "PETR4",
+    "WDO$": "WDO",
+    "WIN$": "WIN",
+}
+
+# Layout posicional dos registros retornados pelo MT5 (copy_rates_from_pos).
+_OHLCV_FIELDS = ("OPEN", "HIGH", "LOW", "CLOSE", "TICKVOL")
+
+
+def records_to_raw_data(
+    records: dict,
+    symbol_prefixes: dict[str, str] = DEFAULT_SYMBOL_PREFIXES,
 ) -> RawData:
-    return RawData(
-        DATE=petr4[0],
-        PETR4_OPEN=float(petr4[1]),
-        PETR4_HIGH=float(petr4[2]),
-        PETR4_LOW=float(petr4[3]),
-        PETR4_CLOSE=float(petr4[4]),
-        PETR4_TICKVOL=float(petr4[5]),
-        WDO_OPEN=float(wdo[1]),
-        WDO_HIGH=float(wdo[2]),
-        WDO_LOW=float(wdo[3]),
-        WDO_CLOSE=float(wdo[4]),
-        WDO_TICKVOL=float(wdo[5]),
-        WIN_OPEN=float(win[1]),
-        WIN_HIGH=float(win[2]),
-        WIN_LOW=float(win[3]),
-        WIN_CLOSE=float(win[4]),
-        WIN_TICKVOL=float(win[5]),
-    )
+    """Converte os registros coletados por símbolo em um RawData wide."""
+    missing = [s for s in symbol_prefixes if records.get(s) is None]
+    if missing:
+        raise ValueError(
+            f"Dados ausentes para os símbolos {missing}. "
+            f"Símbolos coletados: {list(records.keys())}"
+        )
+
+    first_symbol = next(iter(symbol_prefixes))
+    kwargs = {"DATE": records[first_symbol][0]}
+    for symbol, prefix in symbol_prefixes.items():
+        record = records[symbol]
+        for offset, field in enumerate(_OHLCV_FIELDS, start=1):
+            kwargs[f"{prefix}_{field}"] = float(record[offset])
+    return RawData(**kwargs)
+
 
 def raw_batch_to_wide_records(petr4, wdo, win):
     size = min(len(petr4), len(wdo), len(win))

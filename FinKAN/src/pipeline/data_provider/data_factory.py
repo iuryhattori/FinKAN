@@ -1,5 +1,9 @@
+import logging
+
 from src.pipeline.data_provider.data_loader import PETR4_dataset, PETR4_Prediction
 from torch.utils.data import DataLoader
+
+logger = logging.getLogger(__name__)
 
 data_dict = {
     'PETR4':  PETR4_dataset,
@@ -47,7 +51,7 @@ def data_provider(args, flag, prediction_df = None):
             scale=args.scale,
             scalers_path= args.scalers_path,
         )
-    print(flag, len(data_set))
+    logger.info(f"{flag} dataset size: {len(data_set)}")
     data_loader = DataLoader(
         data_set,
         batch_size = batch_size,
