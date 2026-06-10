@@ -1,5 +1,6 @@
 # FinKAN
 
+[![CI](https://github.com/iuryhattori/FinKAN/actions/workflows/ci.yml/badge.svg)](https://github.com/iuryhattori/FinKAN/actions/workflows/ci.yml)
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
@@ -261,7 +262,7 @@ The main files to understand how the system works are:
 - [src/infrastructure/factory/app_factory.py](src/infrastructure/factory/app_factory.py)
 - [src/application/use_cases/data_ingestion_manager.py](src/application/use_cases/data_ingestion_manager.py)
 - [src/application/use_cases/prediction_manager.py](src/application/use_cases/prediction_manager.py)
-- [src/infrastructure/Predictor/Predictor.py](src/infrastructure/Predictor/Predictor.py)
+- [src/infrastructure/predictor/predictor.py](src/infrastructure/predictor/predictor.py)
 - [entrypoint/run_model.py](entrypoint/run_model.py)
 - [entrypoint/run_plot.py](entrypoint/run_plot.py)
 
