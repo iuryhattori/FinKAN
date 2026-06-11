@@ -10,6 +10,8 @@
 
 The project demonstrates how a Machine Learning model goes from training notebook to production-style serving: data ingestion, temporal buffering, low-latency ONNX inference, a typed REST/SSE API, and a frontend that consumes it over HTTP with no coupling to the backend internals.
 
+![FinKAN dashboard streaming live PETR4 candles and next-hour forecasts](docs/dashboard/dashboard_git.gif)
+
 ```mermaid
 flowchart LR
     MT5[MetaTrader 5] -->|M15 candles| COL[Async collector]
