@@ -1,317 +1,155 @@
 # FinKAN
 
 [![CI](https://github.com/iuryhattori/FinKAN/actions/workflows/ci.yml/badge.svg)](https://github.com/iuryhattori/FinKAN/actions/workflows/ci.yml)
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![React](https://img.shields.io/badge/react-19-61dafb)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+![Status](https://img.shields.io/badge/status-active%20development-yellow)
 
-FinKAN is a real-time prediction platform for stock market assets. The application collects data from MetaTrader 5, organizes time series, performs inference using a Machine Learning model exported to ONNX, and delivers continuous predictions through a modular, responsibility-oriented architecture designed to evolve.
+**FinKAN is an end-to-end, real-time stock prediction platform.** It collects PETR4 market data from MetaTrader 5, runs inference with a KAN-based time-series model exported to ONNX, and streams continuous predictions to a React dashboard — all built on a decoupled, Clean Architecture-inspired design.
 
-The project was built to explore how software engineering, Machine Learning, and MLOps can be applied to the financial market domain, reducing friction between data collection, training, model export, and production consumption.
+The project demonstrates how a Machine Learning model goes from training notebook to production-style serving: data ingestion, temporal buffering, low-latency ONNX inference, a typed REST/SSE API, and a frontend that consumes it over HTTP with no coupling to the backend internals.
 
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Objective](#objective)
-- [Highlights](#highlights)
-- [System Design](#system-design)
-- [Key Features](#key-features)
-- [Technologies Used](#technologies-used)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Execution](#execution)
-- [Training Flow](#training-flow)
-- [Project Entry Points](#project-entry-points)
-- [Folder Structure](#folder-structure)
-- [Future Improvements](#future-improvements)
-
----
-
-## Overview
-
-FinKAN implements a complete Machine Learning pipeline for financial time series. The application can collect historical and real-time data, prepare temporal windows, run inference with an ONNX model, and support training, evaluation, and artifact export workflows.
-
-When `main.py` is executed, the system initializes the application lifecycle, loads the configuration, connects to MetaTrader 5, starts asynchronous candle collection for the monitored assets, maintains a temporal buffer with the most recent observations, and triggers inference as soon as the input window is complete.
-
----
-
-## Highlights
-
-- Real-time financial inference using MetaTrader 5 data
-- Asynchronous data ingestion and prediction pipeline
-- ONNX Runtime inference for low-latency serving
-- Modular architecture inspired by Clean Architecture and DDD
-- Production-oriented ML workflow with artifact versioning
-- Continuous prediction pipeline for market data (PETR4)
-
----
-
-## Objective
-
-The project aims to demonstrate how Machine Learning models can be operationalized in production-oriented financial scenarios by using real-time market data and a decoupled software architecture.
-
-Instead of concentrating the logic in notebooks or isolated scripts, FinKAN organizes the full flow of ingestion, processing, inference, training, and model export, bringing ML experimentation closer to a production-oriented environment.
-
----
-
-## System Design
-
-FinKAN was structured as a modular, event-oriented pipeline to support continuous financial data ingestion and real-time inference.
-
-Main architectural characteristics:
-
-- asynchronous data ingestion
-- temporal buffering for inference windows
-- decoupled prediction pipeline
-- ONNX-based model serving
-- lifecycle management with FastAPI lifespan
-- fault-tolerant collection with automatic retries
-- separation between domain, application, and infrastructure layers
-
----
-
-## Key Features
-
-- Historical and real-time data collection through MetaTrader 5
-- Time series preprocessing and consolidation
-- Model training for financial forecasting
-- Result evaluation and visualization
-- ONNX model export
-- Continuous inference in production
-- Asynchronous execution of data collection and prediction
-- Modular organization inspired by Clean Architecture and DDD
-
----
-
-## Technologies Used
-
-- Python
-- FastAPI
-- MetaTrader 5
-- ONNX Runtime
-- PyTorch
-- Pandas
-- Polars
-- NumPy
-- Matplotlib
-- PyYAML
-- python-dotenv
-
----
-
-## Architecture
-
-The project was structured with a clear separation between domain, application, infrastructure, and the ML pipeline.
-
-- `src/domain`: entities, value objects, and system contracts
-- `src/application`: use cases and application orchestration
-- `src/infrastructure`: concrete implementations for collection, configuration, buffering, and inference
-- `src/pipeline`: training, experiments, dataloaders, model layers, and utilities
-
-This organization promotes decoupling, testability, and clear responsibility boundaries.
-
----
-
-### Production Flow
-
-1. `main.py` initializes the FastAPI application.
-2. During the `lifespan`, the main application context is assembled.
-3. `AppFactory` instantiates the core system components.
-4. `CollectorManager` runs the asynchronous ingestion pipeline.
-5. `DataCollectorAdapter` consumes real-time candles from MetaTrader 5.
-6. The data is transformed into domain entities.
-7. `PredictorManager` maintains a temporal buffer until the input window is complete.
-8. After the buffer is filled, the input data is organized for inference.
-9. `Predictor` performs inference using ONNX Runtime.
-10. The system remains continuously active, with failure handling, automatic retries, and resilient shutdown behavior.
-
-### Training Flow
-
-1. The training script loads `config/config.yaml`.
-2. The dataset is built from preprocessed data.
-3. The model is trained and evaluated in `src/pipeline/exp`.
-4. Checkpoints are saved to `artifacts/checkpoints/`.
-5. The final model is exported to `onnx/prediction_1h/prediction_1h.onnx`.
-
----
-
-## Prerequisites
-
-Before running the project, make sure you have:
-
-- Windows
-- Python 3.10 or higher
-- GPU
-- MetaTrader 5 installed and configured
-- Access to a valid MT5 account or broker
-- A Python virtual environment
-- Dependencies installed via `requirements.txt` or manually
-
----
-
-## Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/iuryhattori/FinKAN.git
-cd FinKAN
+```mermaid
+flowchart LR
+    MT5[MetaTrader 5] -->|M15 candles| COL[Async collector]
+    COL --> BUF[Temporal buffer]
+    BUF -->|window complete| ONNX[ONNX Runtime inference]
+    ONNX --> REG[(In-memory registries)]
+    REG --> API[FastAPI · REST + SSE]
+    API -->|HTTP /api/v1| UI[React dashboard]
 ```
 
-### 2. Create and activate the virtual environment
+## Why FinKAN
 
-On Windows with PowerShell:
+- **Real-time inference pipeline** — asynchronous candle collection with retry/backoff, temporal buffering, and prediction as soon as the input window completes.
+- **Production-minded ML serving** — the model is exported to ONNX and served with ONNX Runtime on CPU; the scaler is versioned alongside the model artifact and loaded once at startup (fail-fast).
+- **Decoupled by contract** — the frontend only knows four HTTP endpoints; backend internals can change freely. Ports & adapters separate domain, application, and infrastructure.
+- **Replayable test mode** — `mt5_mode: test` replays historical candles in chronological order, so the full pipeline runs even with the market closed.
+- **Tested and CI-backed** — 47 pytest tests (buffers, registries, adapters, retry logic, ONNX predictor, API contract) running on GitHub Actions.
+
+## Getting Started
+
+### Prerequisites
+
+- Windows (the official `MetaTrader5` Python package ships Windows-only wheels)
+- Python 3.10+
+- Node.js 20+
+- MetaTrader 5 installed, with a valid broker account
+- GPU is **only** required for training — serving and the dashboard run on CPU
+
+### 1. Clone and install the backend
 
 ```powershell
+git clone https://github.com/iuryhattori/FinKAN.git
+cd FinKAN
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-Or manually:
+### 2. Configure MT5 credentials
 
-```bash
-pip install fastapi uvicorn MetaTrader5 onnxruntime torch pandas polars numpy matplotlib pyyaml python-dotenv
-```
-
-### 4. Configure environment variables
-
-Create a `.env` file in the project root:
+Create `backend/.env` with your broker credentials:
 
 ```env
-LOGIN=your_login
-PASSWORD=your_password
-SERVER=your_server
-APP_CONFIG_PATH=config/config.yaml
+LOGIN=12345678
+PASSWORD=your-password
+SERVER=YourBroker-Server
 ```
 
-### 5. Review the application configuration
+Runtime behavior lives in [backend/config/config.yaml](backend/config/config.yaml) — notably `mt5_mode` (`test` replays history; `live` follows the market) and the model hyperparameters.
 
-The `config/config.yaml` file centralizes parameters such as:
+### 3. Run the API
 
-- monitored symbols
-- MetaTrader 5 execution mode
-- ONNX model path
-- buffer size
-- time frequency
-- training hyperparameters
-
----
-
-## Execution
-
-### Run the real-time prediction application
-
-```bash
+```powershell
 cd backend
-uvicorn main:app --reload
+uvicorn main:app --port 8000
 ```
 
-When the application starts, it:
+On startup the app loads the ONNX model and scaler, connects to MetaTrader 5, and begins collecting. After the first full window (~20 s in test mode) you will see `Predição registrada para PETR4` in the log.
 
-1. loads the configuration;
-2. connects to MetaTrader 5;
-3. starts data collection;
-4. fills the temporal buffer;
-5. runs inference when the input window is complete.
+### 4. Run the dashboard
 
-### Main endpoints
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-- `GET /health`: checks whether the application was initialized correctly
-- `POST /stop`: requests the shutdown of collection and execution
-- `GET /api/v1/candles/latest` and `GET /api/v1/candles/history?limit=N`: collected candles
-- `GET /api/v1/predictions/latest`: latest model prediction
-- `GET /api/v1/stream`: SSE stream consumed by the frontend
+Open <http://localhost:5173>. In development, Vite proxies `/api` to `localhost:8000` (no CORS setup needed); for production builds, point `VITE_API_BASE_URL` to the deployed API (see [frontend/.env.example](frontend/.env.example)).
 
----
+### 5. Run the tests
+
+```powershell
+pip install -r requirements-dev.txt
+pytest
+```
+
+## API Overview
+
+| Endpoint | Description |
+|---|---|
+| `GET /health` | Liveness and app-context status |
+| `GET /api/v1/candles/latest` | Most recent collected candle (OHLCV + symbol + date) |
+| `GET /api/v1/candles/history?limit=N` | Last N candles, oldest to newest |
+| `GET /api/v1/predictions/latest` | Latest model prediction (OHLC, 1-hour horizon) |
+| `GET /api/v1/stream` | Server-Sent Events stream of candles + predictions |
+| `POST /stop` | Gracefully stops data collection |
+
+Endpoints return `404` while the first window is still being collected — the dashboard treats this as a loading state, not an error.
 
 ## Training Flow
 
-### Train the model and export it to ONNX
-
-```bash
+```powershell
 cd backend
-python entrypoint/run_model.py
+python entrypoint/run_model.py   # trains, evaluates and exports the model
+python entrypoint/run_plot.py    # plots predicted vs. realized values
 ```
 
-This script runs training, performs evaluation, and exports the model to:
+Training reads [backend/config/config.yaml](backend/config/config.yaml), saves checkpoints to `artifacts/checkpoints/`, and exports the final model and its fitted scaler together to `backend/onnx/prediction_1h/` — the exact artifacts the serving path loads.
 
-```text
-onnx/prediction_1h/prediction_1h.onnx
-```
-
-### Generate plots and validate results
-
-```bash
-cd backend
-python entrypoint/run_plot.py
-```
-
-This flow loads the saved checkpoint, generates visualizations comparing real and predicted values, and stores the plots in `imgs/`.
-
----
-
-## Project Entry Points
-
-The main files to understand how the system works are:
-
-- [backend/main.py](backend/main.py)
-- [backend/config/config.yaml](backend/config/config.yaml)
-- [backend/src/infrastructure/factory/app_factory.py](backend/src/infrastructure/factory/app_factory.py)
-- [backend/src/application/use_cases/data_ingestion_manager.py](backend/src/application/use_cases/data_ingestion_manager.py)
-- [backend/src/application/use_cases/prediction_manager.py](backend/src/application/use_cases/prediction_manager.py)
-- [backend/src/infrastructure/predictor/predictor.py](backend/src/infrastructure/predictor/predictor.py)
-- [backend/entrypoint/run_model.py](backend/entrypoint/run_model.py)
-- [backend/entrypoint/run_plot.py](backend/entrypoint/run_plot.py)
-- [frontend/src/services/stockService.js](frontend/src/services/stockService.js)
-- [frontend/src/hooks/connection_hook.jsx](frontend/src/hooks/connection_hook.jsx)
-
-These files represent, respectively, the application entry point, the central configuration, dependency composition, the continuous ingestion flow, inference, and the training and evaluation scripts.
-
----
-
-## Folder Structure
+## Project Structure
 
 ```text
 FinKAN/
-├── .github/workflows/      # CI
-├── backend/                # API FastAPI + pipeline de ML
-│   ├── config/
-│   ├── data/
-│   ├── entrypoint/
-│   ├── onnx/
+├── .github/workflows/      # CI (pytest on windows-latest)
+├── backend/
+│   ├── config/              # Runtime + training configuration
+│   ├── entrypoint/          # Training and plotting scripts
+│   ├── onnx/                # Exported model + scaler artifacts
 │   ├── src/
-│   │   ├── application/
-│   │   ├── domain/
-│   │   ├── infrastructure/
-│   │   ├── pipeline/
-│   │   └── presentation/
-│   └── tests/
-├── frontend/               # Dashboard React (Vite)
+│   │   ├── domain/          # Entities, value objects, contracts
+│   │   ├── application/     # Use cases, ports
+│   │   ├── infrastructure/  # MT5 sources, buffers, ONNX predictor, factory
+│   │   ├── presentation/    # FastAPI controllers and schemas
+│   │   └── pipeline/        # Model, dataloaders, training experiments
+│   └── tests/               # pytest suite (47 tests)
+├── frontend/
 │   └── src/
-│       ├── features/
-│       ├── hooks/
-│       ├── schemas/
-│       └── services/
+│       ├── services/        # HTTP client + API service layer
+│       ├── schemas/         # DTO → UI model mappers
+│       ├── hooks/           # useMarketData (REST bootstrap + SSE)
+│       └── features/        # Dashboard components
 ├── pyproject.toml
 └── README.md
 ```
 
-## Future Improvements
+Key files to start reading: [backend/main.py](backend/main.py) (app lifecycle), [backend/src/infrastructure/factory/app_factory.py](backend/src/infrastructure/factory/app_factory.py) (dependency composition), [backend/src/application/use_cases/prediction_manager.py](backend/src/application/use_cases/prediction_manager.py) (inference orchestration), and [frontend/src/hooks/connection_hook.jsx](frontend/src/hooks/connection_hook.jsx) (how the UI consumes the API).
 
-- Docker containerization
-- Kafka integration for streaming
-- WebSocket endpoints for real-time predictions
-- Monitoring and observability
-- Automatic model retraining
-- Model registry and experiment tracking
-- Distributed inference workers
-- CI/CD integration
+## Roadmap
+
+- Event bus replacing the SSE polling loop
+- Server-side prediction history endpoint
+- Experiment tracking (MLflow) and a simple model registry
+- Prometheus metrics and drift detection
+- Partial Docker support (API in replay mode; MT5 is Windows-only)
+
+## Getting Help
+
+- Open an [issue](https://github.com/iuryhattori/FinKAN/issues) for bugs or questions
+- Check the [CI runs](https://github.com/iuryhattori/FinKAN/actions) for the expected green-state of the test suite
+
+## Maintainer & Contributing
+
+Issues and pull requests are welcome — please run `pytest` and `npm run lint` before submitting.
