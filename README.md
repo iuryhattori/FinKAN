@@ -211,6 +211,7 @@ The `config/config.yaml` file centralizes parameters such as:
 ### Run the real-time prediction application
 
 ```bash
+cd backend
 uvicorn main:app --reload
 ```
 
@@ -225,7 +226,10 @@ When the application starts, it:
 ### Main endpoints
 
 - `GET /health`: checks whether the application was initialized correctly
-- `GET /stop`: requests the shutdown of collection and execution
+- `POST /stop`: requests the shutdown of collection and execution
+- `GET /api/v1/candles/latest` and `GET /api/v1/candles/history?limit=N`: collected candles
+- `GET /api/v1/predictions/latest`: latest model prediction
+- `GET /api/v1/stream`: SSE stream consumed by the frontend
 
 ---
 
@@ -234,6 +238,7 @@ When the application starts, it:
 ### Train the model and export it to ONNX
 
 ```bash
+cd backend
 python entrypoint/run_model.py
 ```
 
@@ -246,6 +251,7 @@ onnx/prediction_1h/prediction_1h.onnx
 ### Generate plots and validate results
 
 ```bash
+cd backend
 python entrypoint/run_plot.py
 ```
 
@@ -257,14 +263,16 @@ This flow loads the saved checkpoint, generates visualizations comparing real an
 
 The main files to understand how the system works are:
 
-- [main.py](main.py)
-- [config/config.yaml](config/config.yaml)
-- [src/infrastructure/factory/app_factory.py](src/infrastructure/factory/app_factory.py)
-- [src/application/use_cases/data_ingestion_manager.py](src/application/use_cases/data_ingestion_manager.py)
-- [src/application/use_cases/prediction_manager.py](src/application/use_cases/prediction_manager.py)
-- [src/infrastructure/predictor/predictor.py](src/infrastructure/predictor/predictor.py)
-- [entrypoint/run_model.py](entrypoint/run_model.py)
-- [entrypoint/run_plot.py](entrypoint/run_plot.py)
+- [backend/main.py](backend/main.py)
+- [backend/config/config.yaml](backend/config/config.yaml)
+- [backend/src/infrastructure/factory/app_factory.py](backend/src/infrastructure/factory/app_factory.py)
+- [backend/src/application/use_cases/data_ingestion_manager.py](backend/src/application/use_cases/data_ingestion_manager.py)
+- [backend/src/application/use_cases/prediction_manager.py](backend/src/application/use_cases/prediction_manager.py)
+- [backend/src/infrastructure/predictor/predictor.py](backend/src/infrastructure/predictor/predictor.py)
+- [backend/entrypoint/run_model.py](backend/entrypoint/run_model.py)
+- [backend/entrypoint/run_plot.py](backend/entrypoint/run_plot.py)
+- [frontend/src/services/stockService.js](frontend/src/services/stockService.js)
+- [frontend/src/hooks/connection_hook.jsx](frontend/src/hooks/connection_hook.jsx)
 
 These files represent, respectively, the application entry point, the central configuration, dependency composition, the continuous ingestion flow, inference, and the training and evaluation scripts.
 
@@ -274,17 +282,26 @@ These files represent, respectively, the application entry point, the central co
 
 ```text
 FinKAN/
-├── artifacts/
-├── config/
-├── data/
-├── entrypoint/
-├── imgs/
-├── onnx/
-├── src/
-│   ├── application/
-│   ├── domain/
-│   ├── infrastructure/
-│   └── pipeline/
+├── .github/workflows/      # CI
+├── backend/                # API FastAPI + pipeline de ML
+│   ├── config/
+│   ├── data/
+│   ├── entrypoint/
+│   ├── onnx/
+│   ├── src/
+│   │   ├── application/
+│   │   ├── domain/
+│   │   ├── infrastructure/
+│   │   ├── pipeline/
+│   │   └── presentation/
+│   └── tests/
+├── frontend/               # Dashboard React (Vite)
+│   └── src/
+│       ├── features/
+│       ├── hooks/
+│       ├── schemas/
+│       └── services/
+├── pyproject.toml
 └── README.md
 ```
 
