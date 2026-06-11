@@ -19,7 +19,7 @@ function ChartTooltip({ active, payload, label }) {
       style={{ backgroundColor: 'var(--elevated)', borderColor: 'var(--border-strong)' }}
     >
       <p className="mb-1.5 uppercase tracking-wider text-[9px]" style={{ color: 'var(--muted-foreground)' }}>
-        {isPrediction ? `Projeção · ${formatTickTime(label)}` : formatFullTime(label)}
+        {isPrediction ? `Forecast · ${formatTickTime(label)}` : formatFullTime(label)}
       </p>
       {rows.map((p, i) => (
         <div key={i} className="flex items-center justify-between gap-4">
@@ -49,13 +49,13 @@ export function PredictionChart({ data }) {
   return (
     <section
       className="panel p-4 h-full"
-      aria-label="Gráfico de preço PETR4 — histórico e projeção"
+      aria-label="PETR4 price chart — history and forecast"
     >
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="section-label mb-0.5">Preço · PETR4</p>
+          <p className="section-label mb-0.5">Price · PETR4</p>
           <p className="text-xs" style={{ color: 'var(--foreground)' }}>
-            Evolução da sessão e projeção para a próxima hora
+            Session history and next-hour forecast
           </p>
         </div>
         <div
@@ -63,9 +63,9 @@ export function PredictionChart({ data }) {
           style={{ color: 'var(--muted-foreground)' }}
           aria-hidden="true"
         >
-          <LegendKey color="var(--up)">Fechamento</LegendKey>
-          <LegendKey color="var(--info)">Abertura</LegendKey>
-          <LegendKey color="var(--up)" dashed>Projeção</LegendKey>
+          <LegendKey color="var(--up)">Close</LegendKey>
+          <LegendKey color="var(--info)">Open</LegendKey>
+          <LegendKey color="var(--up)" dashed>Forecast</LegendKey>
         </div>
       </div>
 
@@ -107,7 +107,7 @@ export function PredictionChart({ data }) {
               stroke="rgba(255,255,255,0.12)"
               strokeDasharray="3 3"
               label={{
-                value: 'AGORA',
+                value: 'NOW',
                 fill: '#5c6470',
                 fontSize: 9,
                 fontFamily: 'var(--data-font)',
@@ -130,7 +130,7 @@ export function PredictionChart({ data }) {
             stroke="var(--up)"
             strokeWidth={1.5}
             dot={false}
-            name="Fechamento"
+            name="Close"
             connectNulls={false}
           />
           <Line
@@ -139,7 +139,7 @@ export function PredictionChart({ data }) {
             stroke="var(--info)"
             strokeWidth={1}
             dot={false}
-            name="Abertura"
+            name="Open"
             opacity={0.55}
             connectNulls={false}
           />
@@ -150,7 +150,7 @@ export function PredictionChart({ data }) {
             strokeWidth={1.5}
             strokeDasharray="4 3"
             dot={{ fill: 'var(--up)', r: 3, strokeWidth: 0 }}
-            name="Proj. Fechamento"
+            name="Forecast Close"
           />
           <Line
             type="monotone"
@@ -159,7 +159,7 @@ export function PredictionChart({ data }) {
             strokeWidth={1}
             strokeDasharray="4 3"
             dot={{ fill: 'var(--info)', r: 3, strokeWidth: 0 }}
-            name="Proj. Abertura"
+            name="Forecast Open"
             opacity={0.55}
           />
         </ComposedChart>

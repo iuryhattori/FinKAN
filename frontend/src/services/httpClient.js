@@ -33,8 +33,8 @@ export async function getJson(path, { signal, timeoutMs = DEFAULT_TIMEOUT_MS } =
   } catch (cause) {
     throw new ApiError(
       cause.name === 'AbortError'
-        ? `Tempo limite excedido ao chamar ${path}`
-        : `Falha de rede ao chamar ${path}`,
+        ? `Request to ${path} timed out`
+        : `Network failure while calling ${path}`,
       { url, cause },
     );
   } finally {
@@ -42,7 +42,7 @@ export async function getJson(path, { signal, timeoutMs = DEFAULT_TIMEOUT_MS } =
   }
 
   if (!response.ok) {
-    throw new ApiError(`API respondeu ${response.status} em ${path}`, {
+    throw new ApiError(`API responded ${response.status} on ${path}`, {
       status: response.status,
       url,
     });
@@ -51,6 +51,6 @@ export async function getJson(path, { signal, timeoutMs = DEFAULT_TIMEOUT_MS } =
   try {
     return await response.json();
   } catch (cause) {
-    throw new ApiError(`Resposta de ${path} não é JSON válido`, { url, cause });
+    throw new ApiError(`Response from ${path} is not valid JSON`, { url, cause });
   }
 }

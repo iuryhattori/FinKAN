@@ -8,10 +8,10 @@ function isMarketOpen(time) {
 }
 
 const connectionConfig = {
-  live: { label: 'Tempo real', color: 'var(--up)', pulse: true },
-  loading: { label: 'Conectando…', color: 'var(--warn)', pulse: true },
-  reconnecting: { label: 'Reconectando…', color: 'var(--warn)', pulse: true },
-  error: { label: 'Sem conexão', color: 'var(--down)', pulse: false },
+  live: { label: 'Live', color: 'var(--up)', pulse: true },
+  loading: { label: 'Connecting…', color: 'var(--warn)', pulse: true },
+  reconnecting: { label: 'Reconnecting…', color: 'var(--warn)', pulse: true },
+  error: { label: 'Offline', color: 'var(--down)', pulse: false },
 };
 
 function StatusDot({ color, pulse }) {
@@ -54,7 +54,7 @@ export function Header({ currentTime, connectionStatus = 'loading' }) {
               FinKAN
             </p>
             <p className="text-[10px] tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-              Análise preditiva de ativos
+              Predictive market analytics
             </p>
           </div>
         </div>
@@ -65,10 +65,10 @@ export function Header({ currentTime, connectionStatus = 'loading' }) {
             <StatusDot color={open ? 'var(--up)' : 'var(--faint)'} pulse={open} />
             <div className="leading-tight">
               <p className="text-xs" style={{ color: 'var(--foreground)' }}>
-                {open ? 'Pregão aberto' : 'Pregão fechado'}
+                {open ? 'Market open' : 'Market closed'}
               </p>
               <p className="text-[10px]" style={{ color: 'var(--muted-foreground)' }}>
-                {open ? 'B3 · encerra às 17h30' : 'B3 · reabre às 10h00'}
+                {open ? 'B3 · closes at 17:30' : 'B3 · opens at 10:00'}
               </p>
             </div>
           </div>
@@ -82,7 +82,7 @@ export function Header({ currentTime, connectionStatus = 'loading' }) {
                 {connection.label}
               </p>
               <p className="text-[10px]" style={{ color: 'var(--muted-foreground)' }}>
-                Dados via MetaTrader 5
+                Data via MetaTrader 5
               </p>
             </div>
           </div>
@@ -91,10 +91,10 @@ export function Header({ currentTime, connectionStatus = 'loading' }) {
 
           <div className="leading-tight text-right">
             <p className="text-xs font-data" style={{ color: 'var(--foreground)' }}>
-              {currentTime.toLocaleTimeString('pt-BR')}
+              {currentTime.toLocaleTimeString('en-GB')}
             </p>
             <p className="text-[10px]" style={{ color: 'var(--muted-foreground)' }}>
-              Horizonte de projeção · 1h
+              Forecast horizon · 1h
             </p>
           </div>
         </div>

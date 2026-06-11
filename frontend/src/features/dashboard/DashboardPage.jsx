@@ -12,10 +12,10 @@ import { buildPriceChartData, buildVolumeChartData } from './selectors';
 
 // O modelo prevê apenas OHLC; volume não tem projeção.
 const predictionFields = [
-  { label: 'Abertura', key: 'open' },
-  { label: 'Fechamento', key: 'close' },
-  { label: 'Máxima', key: 'high' },
-  { label: 'Mínima', key: 'low' },
+  { label: 'Open', key: 'open' },
+  { label: 'Close', key: 'close' },
+  { label: 'High', key: 'high' },
+  { label: 'Low', key: 'low' },
 ];
 
 /** Resumo em linguagem natural da projeção de fechamento. */
@@ -27,16 +27,16 @@ function TrendSummary({ current, prediction }) {
   const tone = isFlat ? 'var(--muted-foreground)' : isUp ? 'var(--up)' : 'var(--down)';
   const Icon = isFlat ? Minus : isUp ? TrendingUp : TrendingDown;
   const phrase = isFlat
-    ? 'estabilidade no fechamento da próxima hora'
-    : `${isUp ? 'alta' : 'queda'} de ${Math.abs(pct).toFixed(2)}% no fechamento da próxima hora`;
+    ? 'a stable close for the next hour'
+    : `a ${Math.abs(pct).toFixed(2)}% ${isUp ? 'rise' : 'drop'} in the next hour's close`;
 
   return (
     <p className="flex items-center gap-2 text-xs" style={{ color: 'var(--secondary-foreground)' }}>
       <Icon className="w-3.5 h-3.5 flex-none" style={{ color: tone }} aria-hidden="true" />
       <span>
-        O modelo projeta{' '}
+        The model forecasts{' '}
         <span style={{ color: tone, fontWeight: 600 }}>{phrase}</span>
-        {' '}— de R$ {current.close.toFixed(2)} para{' '}
+        {' '}— from R$ {current.close.toFixed(2)} to{' '}
         <span className="font-data" style={{ color: 'var(--foreground)' }}>
           R$ {prediction.close.toFixed(2)}
         </span>.
@@ -66,10 +66,10 @@ function ErrorBanner({ error, onRetry }) {
         <AlertTriangle className="w-4 h-4" style={{ color: 'var(--down)' }} aria-hidden="true" />
         <div>
           <p className="text-xs" style={{ color: 'var(--foreground)' }}>
-            Não conseguimos falar com os servidores agora.
+            We can&apos;t reach the servers right now.
           </p>
           <p className="text-[11px]" style={{ color: 'var(--muted-foreground)' }}>
-            {error?.message ?? 'Erro desconhecido'} — verifique se a API FinKAN está no ar e tente de novo.
+            {error?.message ?? 'Unknown error'} — make sure the FinKAN API is running and try again.
           </p>
         </div>
       </div>
@@ -79,7 +79,7 @@ function ErrorBanner({ error, onRetry }) {
         style={{ color: 'var(--foreground)', borderColor: 'var(--border-strong)' }}
       >
         <RefreshCw className="w-3 h-3" aria-hidden="true" />
-        Tentar de novo
+        Try again
       </button>
     </div>
   );
@@ -128,20 +128,20 @@ export function DashboardPage() {
         {status === 'error' && <ErrorBanner error={error} onRetry={retry} />}
 
         {status === 'loading' && (
-          <WaitingPanel message="Conectando aos servidores FinKAN…" />
+          <WaitingPanel message="Connecting to FinKAN servers…" />
         )}
 
         {status !== 'loading' && status !== 'error' && !currentData && (
-          <WaitingPanel message="Conexão estabelecida. Aguardando os primeiros candles do MetaTrader 5 — isso leva alguns segundos." />
+          <WaitingPanel message="Connected. Waiting for the first candles from MetaTrader 5 — this takes a few seconds." />
         )}
 
         {currentData && (
           <>
             <MarketOverview currentData={currentData} />
 
-            <section aria-label="Projeções para a próxima hora">
+            <section aria-label="Next hour forecasts">
               <div className="mb-3 space-y-1.5">
-                <SectionHeading title="Projeção · Próxima hora" />
+                <SectionHeading title="Forecast · Next hour" />
                 {prediction && <TrendSummary current={currentData} prediction={prediction} />}
               </div>
 
@@ -157,13 +157,13 @@ export function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <WaitingPanel message="O modelo está reunindo dados suficientes para a primeira projeção…" />
+                <WaitingPanel message="The model is gathering enough data for its first forecast…" />
               )}
             </section>
 
             <section
               className="grid grid-cols-1 lg:grid-cols-5 gap-4"
-              aria-label="Gráficos de mercado"
+              aria-label="Market charts"
             >
               <div className="lg:col-span-3">
                 <PredictionChart data={priceChartData} />
@@ -173,11 +173,11 @@ export function DashboardPage() {
               </div>
             </section>
 
-            <section aria-label="Precisão das projeções">
+            <section aria-label="Forecast accuracy">
               {predictionHistory.length > 0 ? (
                 <PredictionHistoryTable history={predictionHistory} />
               ) : (
-                <WaitingPanel message="Conforme novas projeções forem confrontadas com os preços realizados, o histórico de precisão do modelo aparece aqui." />
+                <WaitingPanel message="As new forecasts are compared against realized prices, the model's accuracy history will appear here." />
               )}
             </section>
           </>
@@ -193,10 +193,10 @@ export function DashboardPage() {
           style={{ color: 'var(--faint)' }}
         >
           <span>
-            As projeções são geradas por um modelo estatístico e têm caráter exclusivamente
-            informativo — não constituem recomendação de investimento.
+            Forecasts are produced by a statistical model for informational purposes only —
+            they do not constitute investment advice.
           </span>
-          <span className="font-data">FinKAN · PETR4 · horizonte 1h</span>
+          <span className="font-data">FinKAN · PETR4 · 1h horizon</span>
         </div>
       </footer>
     </div>

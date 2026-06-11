@@ -3,7 +3,7 @@
 
 function requireNumber(value, field) {
   if (typeof value !== 'number' || Number.isNaN(value)) {
-    throw new Error(`Candle inválido: campo "${field}" ausente ou não numérico`);
+    throw new Error(`Invalid candle: field "${field}" is missing or not a number`);
   }
   return value;
 }
@@ -14,7 +14,7 @@ function requireNumber(value, field) {
  */
 export function parseCandle(dto) {
   if (!dto || typeof dto !== 'object') {
-    throw new Error('Candle inválido: payload vazio');
+    throw new Error('Invalid candle: empty payload');
   }
   return {
     symbol: typeof dto.symbol === 'string' ? dto.symbol : '',

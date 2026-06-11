@@ -3,7 +3,7 @@
 
 function requireNumber(value, field) {
   if (typeof value !== 'number' || Number.isNaN(value)) {
-    throw new Error(`Predição inválida: campo "${field}" ausente ou não numérico`);
+    throw new Error(`Invalid prediction: field "${field}" is missing or not a number`);
   }
   return value;
 }
@@ -14,7 +14,7 @@ function requireNumber(value, field) {
  */
 export function parsePrediction(dto) {
   if (!dto || typeof dto !== 'object') {
-    throw new Error('Predição inválida: payload vazio');
+    throw new Error('Invalid prediction: empty payload');
   }
   return {
     symbol: typeof dto.symbol === 'string' ? dto.symbol : '',

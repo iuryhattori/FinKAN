@@ -1,15 +1,18 @@
+// en-GB mantém formato 24h e dd/MM, coerente com o pregão da B3.
+const LOCALE = 'en-GB';
+
 // Rótulo curto de horário para ticks de eixo (recebe timestamp em ms).
 export function formatTickTime(value) {
   if (typeof value !== 'number') return value;
-  return new Date(value).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return new Date(value).toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
 }
 
 // Data e hora completas para tooltips (recebe timestamp em ms).
 export function formatFullTime(value) {
   if (typeof value !== 'number') return value;
   const d = new Date(value);
-  const date = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-  const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const date = d.toLocaleDateString(LOCALE, { day: '2-digit', month: '2-digit' });
+  const time = d.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
   return `${date} · ${time}`;
 }
 

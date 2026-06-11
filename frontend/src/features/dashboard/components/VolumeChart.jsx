@@ -28,13 +28,13 @@ export function VolumeChart({ data }) {
   return (
     <section
       className="panel p-4 h-full"
-      aria-label="Gráfico de volume de negociação PETR4"
+      aria-label="PETR4 trading volume chart"
     >
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="section-label mb-0.5">Volume · PETR4</p>
           <p className="text-xs" style={{ color: 'var(--foreground)' }}>
-            Intensidade de negociação por candle
+            Trading activity per candle
           </p>
         </div>
         <div
@@ -43,7 +43,7 @@ export function VolumeChart({ data }) {
           aria-hidden="true"
         >
           <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: 'var(--info)', opacity: 0.7 }} />
-          Ticks negociados
+          Traded ticks
         </div>
       </div>
 

@@ -14,14 +14,14 @@ export function PredictionCard({ label, current, predicted }) {
   return (
     <article
       className="panel p-3.5 flex flex-col gap-3"
-      aria-label={`Projeção de ${label} para a próxima hora`}
+      aria-label={`${label} forecast for the next hour`}
     >
       <div className="flex items-center justify-between">
         <span className="section-label">{label}</span>
         <span
           className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-sm font-data"
           style={{ color: tone, backgroundColor: toneBg }}
-          aria-label={`Variação projetada: ${isPositive ? '+' : ''}${changePercent.toFixed(2)}%`}
+          aria-label={`Forecast change: ${isPositive ? '+' : ''}${changePercent.toFixed(2)}%`}
         >
           <TrendIcon className="w-2.5 h-2.5" aria-hidden="true" />
           {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
@@ -31,7 +31,7 @@ export function PredictionCard({ label, current, predicted }) {
       <div className="flex items-center justify-between gap-2">
         <div className="leading-tight">
           <p className="text-[10px] mb-0.5" style={{ color: 'var(--muted-foreground)' }}>
-            Agora
+            Now
           </p>
           <p className="text-xs font-data" style={{ color: 'var(--secondary-foreground)' }}>
             {fmt(current)}
@@ -40,7 +40,7 @@ export function PredictionCard({ label, current, predicted }) {
         <ArrowRight className="w-3 h-3 flex-none" style={{ color: 'var(--faint)' }} aria-hidden="true" />
         <div className="leading-tight text-right">
           <p className="text-[10px] mb-0.5" style={{ color: 'var(--muted-foreground)' }}>
-            Em 1 hora
+            In 1 hour
           </p>
           <p className="text-sm font-semibold font-data" style={{ color: tone }}>
             {fmt(predicted)}

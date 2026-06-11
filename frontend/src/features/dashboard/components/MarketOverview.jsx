@@ -21,7 +21,7 @@ function DayRangeBar({ low, high, close }) {
   const position = span > 0 ? Math.min(Math.max((close - low) / span, 0), 1) : 0.5;
 
   return (
-    <div className="flex items-center gap-3 min-w-[220px]" aria-label="Posição na faixa do período">
+    <div className="flex items-center gap-3 min-w-[220px]" aria-label="Position within session range">
       <span className="text-[10px] font-data" style={{ color: 'var(--down)' }}>
         {low.toFixed(2)}
       </span>
@@ -49,19 +49,19 @@ export function MarketOverview({ currentData }) {
   const TrendIcon = isUp ? TrendingUp : TrendingDown;
 
   const stats = [
-    { label: 'Abertura', value: `R$ ${currentData.open.toFixed(2)}` },
-    { label: 'Fechamento', value: `R$ ${currentData.close.toFixed(2)}` },
-    { label: 'Máxima', value: `R$ ${currentData.high.toFixed(2)}`, color: 'var(--up)' },
-    { label: 'Mínima', value: `R$ ${currentData.low.toFixed(2)}`, color: 'var(--down)' },
+    { label: 'Open', value: `R$ ${currentData.open.toFixed(2)}` },
+    { label: 'Close', value: `R$ ${currentData.close.toFixed(2)}` },
+    { label: 'High', value: `R$ ${currentData.high.toFixed(2)}`, color: 'var(--up)' },
+    { label: 'Low', value: `R$ ${currentData.low.toFixed(2)}`, color: 'var(--down)' },
     { label: 'Volume (ticks)', value: formatVolume(currentData.volume) },
   ];
 
   const updatedAt = currentData.date
-    ? currentData.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    ? currentData.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
     : null;
 
   return (
-    <section className="panel overflow-hidden" aria-label="Visão geral do ativo PETR4">
+    <section className="panel overflow-hidden" aria-label="PETR4 market overview">
       <div className="flex items-start justify-between p-5 pb-4">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
@@ -100,13 +100,13 @@ export function MarketOverview({ currentData }) {
 
           <p className="text-[10px] mt-1.5" style={{ color: 'var(--muted-foreground)' }}>
             {updatedAt
-              ? `Último candle às ${updatedAt} · variação sobre a abertura do período`
-              : 'Variação sobre a abertura do período'}
+              ? `Last candle at ${updatedAt} · change vs. period open`
+              : 'Change vs. period open'}
           </p>
         </div>
 
         <div className="flex flex-col items-end gap-3 pt-1">
-          <span className="section-label">Faixa do período</span>
+          <span className="section-label">Session range</span>
           <DayRangeBar low={currentData.low} high={currentData.high} close={currentData.close} />
         </div>
       </div>

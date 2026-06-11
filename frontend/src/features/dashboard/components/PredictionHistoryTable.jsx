@@ -5,18 +5,18 @@ function mae(history) {
 }
 
 function accuracyTone(errorPercent) {
-  if (errorPercent < 0.5) return { label: 'No alvo', color: 'var(--up)', bg: 'var(--up-bg)' };
-  if (errorPercent < 1) return { label: 'Próximo', color: 'var(--warn)', bg: 'var(--warn-bg)' };
-  return { label: 'Desviou', color: 'var(--down)', bg: 'var(--down-bg)' };
+  if (errorPercent < 0.5) return { label: 'On target', color: 'var(--up)', bg: 'var(--up-bg)' };
+  if (errorPercent < 1) return { label: 'Near', color: 'var(--warn)', bg: 'var(--warn-bg)' };
+  return { label: 'Missed', color: 'var(--down)', bg: 'var(--down-bg)' };
 }
 
 const columns = [
-  { label: 'Horário', align: 'left' },
-  { label: 'Projetado', align: 'right' },
-  { label: 'Realizado', align: 'right' },
-  { label: 'Diferença', align: 'right' },
-  { label: 'Erro', align: 'right' },
-  { label: 'Avaliação', align: 'right' },
+  { label: 'Time', align: 'left' },
+  { label: 'Forecast', align: 'right' },
+  { label: 'Realized', align: 'right' },
+  { label: 'Difference', align: 'right' },
+  { label: 'Error', align: 'right' },
+  { label: 'Rating', align: 'right' },
 ];
 
 export function PredictionHistoryTable({ history }) {
@@ -24,7 +24,7 @@ export function PredictionHistoryTable({ history }) {
   const avgErrorPct = (avgError / history[0].actualClose) * 100;
 
   return (
-    <section className="panel overflow-hidden" aria-label="Precisão das projeções PETR4">
+    <section className="panel overflow-hidden" aria-label="PETR4 forecast accuracy">
       <div
         className="flex items-center justify-between px-4 py-3 border-b"
         style={{ backgroundColor: 'var(--muted)', borderColor: 'var(--panel-border)' }}
@@ -33,24 +33,24 @@ export function PredictionHistoryTable({ history }) {
           <Target className="w-3.5 h-3.5" style={{ color: 'var(--brand)' }} aria-hidden="true" />
           <div className="leading-tight">
             <p className="text-xs" style={{ color: 'var(--foreground)' }}>
-              Precisão do modelo
+              Model accuracy
             </p>
             <p className="text-[10px]" style={{ color: 'var(--muted-foreground)' }}>
-              Cada projeção comparada com o preço que de fato se realizou
+              Each forecast compared against the price that actually realized
             </p>
           </div>
         </div>
         <dl className="flex items-center gap-5 text-[10px] font-data">
-          <div className="flex items-center gap-1.5" title="Erro médio absoluto das projeções">
-            <dt style={{ color: 'var(--muted-foreground)' }}>Erro médio:</dt>
+          <div className="flex items-center gap-1.5" title="Mean absolute error of the forecasts">
+            <dt style={{ color: 'var(--muted-foreground)' }}>Avg error:</dt>
             <dd style={{ color: 'var(--foreground)' }}>R$ {avgError.toFixed(3)}</dd>
           </div>
-          <div className="flex items-center gap-1.5" title="Erro percentual médio das projeções">
-            <dt style={{ color: 'var(--muted-foreground)' }}>Em %:</dt>
+          <div className="flex items-center gap-1.5" title="Mean percentage error of the forecasts">
+            <dt style={{ color: 'var(--muted-foreground)' }}>As %:</dt>
             <dd style={{ color: 'var(--foreground)' }}>{avgErrorPct.toFixed(3)}%</dd>
           </div>
           <div className="flex items-center gap-1.5">
-            <dt style={{ color: 'var(--muted-foreground)' }}>Projeções:</dt>
+            <dt style={{ color: 'var(--muted-foreground)' }}>Forecasts:</dt>
             <dd style={{ color: 'var(--foreground)' }}>{history.length}</dd>
           </div>
         </dl>
@@ -85,10 +85,10 @@ export function PredictionHistoryTable({ history }) {
                 >
                   <td className="py-3 px-4">
                     <span className="text-xs font-data" style={{ color: 'var(--foreground)' }}>
-                      {new Date(record.timestamp).toLocaleTimeString('pt-BR')}
+                      {new Date(record.timestamp).toLocaleTimeString('en-GB')}
                     </span>
                     <span className="text-[10px] ml-2 font-data" style={{ color: 'var(--muted-foreground)' }}>
-                      {new Date(record.timestamp).toLocaleDateString('pt-BR')}
+                      {new Date(record.timestamp).toLocaleDateString('en-GB')}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-right text-xs font-data" style={{ color: 'var(--secondary-foreground)' }}>

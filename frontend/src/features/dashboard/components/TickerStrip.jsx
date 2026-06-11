@@ -17,7 +17,7 @@ export function TickerStrip({ currentTime }) {
       className="border-b overflow-hidden h-7 flex items-center"
       style={{ backgroundColor: '#07080b', borderColor: 'var(--panel-border)' }}
       role="marquee"
-      aria-label="Panorama do mercado"
+      aria-label="Market overview ticker"
     >
       <div
         className="flex-none px-3 h-full flex items-center gap-1.5 border-r"
@@ -27,7 +27,7 @@ export function TickerStrip({ currentTime }) {
           B3
         </span>
         <span className="text-[9px] tracking-wider uppercase" style={{ color: 'var(--faint)' }}>
-          panorama
+          overview
         </span>
       </div>
 
@@ -75,7 +75,7 @@ export function TickerStrip({ currentTime }) {
           style={{ color: 'var(--muted-foreground)' }}
           dateTime={currentTime.toISOString()}
         >
-          {currentTime.toLocaleDateString('pt-BR')} · {currentTime.toLocaleTimeString('pt-BR')}
+          {currentTime.toLocaleDateString('en-GB')} · {currentTime.toLocaleTimeString('en-GB')}
         </time>
       </div>
     </div>
