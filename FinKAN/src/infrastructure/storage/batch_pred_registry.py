@@ -13,5 +13,8 @@ class BatchPredRegistry(BatchRegistryInterface):
     def latest(self):
         return self._batches[-1] if self._batches else None
 
+    def all(self) -> list:
+        return list(self._batches)
+
     def reset(self):
         self._batches = deque(maxlen=self._maxlen)

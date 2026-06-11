@@ -13,3 +13,7 @@ class BatchRegistryInterface(ABC):
     def latest(self) -> Any:
         """Retorna o elemento mais recente (candle ou batch)."""
         pass
+    @abstractmethod
+    def all(self) -> list:
+        """Retorna todos os elementos retidos, do mais antigo ao mais recente."""
+        pass

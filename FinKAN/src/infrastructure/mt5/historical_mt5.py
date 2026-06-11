@@ -30,7 +30,10 @@ class HistoricalMt5(DataSourceInterface):
             logger.error(f"[MT5 fetch error] symbol='{symbol}' [{code}]: {msg}")
             return None
 
-        self._positions[symbol] = pos + 1
+        # copy_rates_from_pos conta posições para o passado (0 = candle atual),
+        # então o replay decrementa para andar em ordem cronológica.
+        # Ao chegar em 0, permanece no candle mais recente.
+        self._positions[symbol] = max(pos - 1, 0)
         return raw[0]
 
     def disconnect(self) -> None:

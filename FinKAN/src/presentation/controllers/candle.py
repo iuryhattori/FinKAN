@@ -1,8 +1,20 @@
-from fastapi import APIRouter, HTTPException, Request
-import asyncio
-from src.presentation.schemas.candle_schema import CandleResponse
+from fastapi import APIRouter, HTTPException, Query, Request
+from src.presentation.schemas.candle_schema import CandleHistoryResponse, CandleResponse
 
 candle_router = APIRouter()
+
+
+def _to_response(candle) -> CandleResponse:
+    return CandleResponse(
+        symbol=candle.symbol,
+        date=float(candle.date) if candle.date is not None else None,
+        open=candle.open,
+        high=candle.high,
+        low=candle.low,
+        close=candle.close,
+        volume=float(candle.tick_vol),
+    )
+
 
 @candle_router.get("/api/v1/candles/latest", response_model=CandleResponse)
 async def get_latest_candle(request: Request):
@@ -13,10 +25,18 @@ async def get_latest_candle(request: Request):
         raise HTTPException(status_code=404, detail="Nenhum candle disponível")
     if not latest_batch.candles:
         raise HTTPException(status_code=404, detail="Nenhum candle disponível")
-    latest_candle = latest_batch.candles[-1]
-    return CandleResponse(
-        open=latest_candle.open,
-        high=latest_candle.high,
-        low=latest_candle.low,
-        close=latest_candle.close,
-    )
+    return _to_response(latest_batch.candles[-1])
+
+
+@candle_router.get("/api/v1/candles/history", response_model=CandleHistoryResponse)
+async def get_candle_history(request: Request, limit: int = Query(default=100, ge=1, le=1000)):
+    """Retorna os últimos N candles coletados, do mais antigo ao mais recente."""
+    app_context = request.app.state.app_context
+    batch_candle_registry = app_context["batch_candle_registry"]
+
+    candles = [
+        candle
+        for batch in batch_candle_registry.all()
+        for candle in batch.candles
+    ]
+    return CandleHistoryResponse(candles=[_to_response(c) for c in candles[-limit:]])

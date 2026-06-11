@@ -34,14 +34,14 @@ async def stream_market(request: Request):
                     if latest_pred is not None:
                         pred_payload = {
                             "symbol": latest_pred.symbol,
-                            "open": latest_pred.open,
-                            "high": latest_pred.high,
-                            "low": latest_pred.low,
-                            "close": latest_pred.close,
+                            "open": float(latest_pred.open),
+                            "high": float(latest_pred.high),
+                            "low": float(latest_pred.low),
+                            "close": float(latest_pred.close),
                         }
 
                     current_key = (
-                        candle.open, candle.high, candle.low, candle.close,
+                        candle.date, candle.open, candle.high, candle.low, candle.close,
                         pred_payload["open"] if pred_payload else None,
                         pred_payload["high"] if pred_payload else None,
                         pred_payload["low"] if pred_payload else None,
@@ -53,10 +53,13 @@ async def stream_market(request: Request):
 
                         payload = {
                             "candle": {
+                                "symbol": candle.symbol,
+                                "date": float(candle.date) if candle.date is not None else None,
                                 "open": candle.open,
                                 "high": candle.high,
                                 "low": candle.low,
                                 "close": candle.close,
+                                "volume": float(candle.tick_vol),
                             },
                             "pred": pred_payload,
                         }

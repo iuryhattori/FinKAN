@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-size: 13px;
+
+  /* Superfícies — azul-carvão profundo, não preto puro */
+  --background: #0a0c10;
+  --foreground: #e8eaee;
+  --card: #10131a;
+  --card-foreground: #e8eaee;
+  --elevated: #151924;
+  --secondary: #181d28;
+  --secondary-foreground: #9aa3b2;
+  --muted: #141821;
+  --muted-foreground: #8b93a1;
+  --faint: #5c6470;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+  --panel-border: rgba(255, 255, 255, 0.05);
+
+  /* Marca — dourado institucional, usado com parcimônia */
+  --brand: #d4b254;
+  --brand-muted: rgba(212, 178, 84, 0.12);
+
+  /* Semântica de mercado */
+  --up: #2eb872;
+  --down: #e5495f;
+  --up-bg: rgba(46, 184, 114, 0.09);
+  --down-bg: rgba(229, 73, 95, 0.09);
+  --info: #5b8def;
+  --warn: #d9a13b;
+  --warn-bg: rgba(217, 161, 59, 0.1);
+
+  /* Compatibilidade com componentes existentes */
+  --accent: var(--brand);
+
+  --data-font: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;
+  --radius-panel: 8px;
+  --radius-chip: 4px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    box-sizing: border-box;
+  }
+  html {
+    font-size: var(--font-size);
+  }
+  body {
+    margin: 0;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #root {
+    width: 100%;
+    text-align: left;
+  }
+  ::selection {
+    background: rgba(212, 178, 84, 0.25);
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #232936;
+    border-radius: 5px;
+    border: 2px solid var(--background);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* Números financeiros: monoespaçado, dígitos tabulares, sem "dança" ao atualizar */
+  .font-data {
+    font-family: var(--data-font);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .panel {
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius-panel);
+  }
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted-foreground);
+  }
+}
