@@ -85,10 +85,10 @@ export function PredictionHistoryTable({ history }) {
                 >
                   <td className="py-3 px-4">
                     <span className="text-xs font-data" style={{ color: 'var(--foreground)' }}>
-                      {new Date(record.timestamp).toLocaleTimeString('en-GB')}
+                      {new Date(record.timestamp).toLocaleTimeString('en-GB', { timeZone: 'UTC' })}
                     </span>
                     <span className="text-[10px] ml-2 font-data" style={{ color: 'var(--muted-foreground)' }}>
-                      {new Date(record.timestamp).toLocaleDateString('en-GB')}
+                      {new Date(record.timestamp).toLocaleDateString('en-GB', { timeZone: 'UTC' })}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-right text-xs font-data" style={{ color: 'var(--secondary-foreground)' }}>

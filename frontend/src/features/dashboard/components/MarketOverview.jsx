@@ -56,8 +56,9 @@ export function MarketOverview({ currentData }) {
     { label: 'Volume (ticks)', value: formatVolume(currentData.volume) },
   ];
 
+  // timeZone UTC: o timestamp do MT5 já é o relógio do pregão (ver lib/format.js)
   const updatedAt = currentData.date
-    ? currentData.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    ? currentData.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
     : null;
 
   return (
